@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apple Support Assistant</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --ink: #1c1c1e; --muted: #6b6b70;
+    --line: #e2e2e0; --accent: #0a66d8; --accent-ink: #ffffff; --chip: #eef3fb;
+    --err: #b42318; --ok: #1a7f37;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151517; --card: #1f1f22; --ink: #f2f2f4; --muted: #9a9aa2; --line: #2e2e33;
+            --accent: #4c9bff; --accent-ink: #0b0b0c; --chip: #1d2a3d; --err: #ff8a80; --ok: #56d364; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card + .card { margin-top: 16px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+         border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  input[type=file] { padding: 8px; }
+  textarea { resize: vertical; min-height: 72px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-top: 12px; }
+  .row > .grow { flex: 1 1 220px; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 10px 18px;
+           background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .examples button { background: var(--chip); color: var(--ink); font-weight: 400; padding: 6px 10px; font-size: 13px; }
+  #thread { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+  .q { font-weight: 600; }
+  .a { white-space: pre-wrap; margin-top: 8px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px;
+          font-size: 13px; color: var(--muted); }
+  .chip { background: var(--chip); color: var(--ink); border-radius: 999px; padding: 2px 10px; }
+  .status { font-size: 13px; margin-top: 10px; color: var(--muted); min-height: 1.5em; }
+  .status.ok { color: var(--ok); } .err, .status.err { color: var(--err); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Apple Support Assistant</h1>
+  <p class="sub">Answers grounded in your documents, with citations. Azure OpenAI + Azure AI Search. Public demo: up to 10 questions a minute.</p>
+
+  <div class="card">
+    <h2>Ask a question</h2>
+    <label for="question">Question</label>
+    <textarea id="question" maxlength="1000" placeholder="How do I pair a Bluetooth device with my iPhone?"></textarea>
+
+    <div class="row">
+      <div class="grow">
+        <label for="doc">Document</label>
+        <select id="doc"><option value="">All documents</option></select>
+      </div>
+      <div class="grow">
+        <label for="mode">Retrieval mode</label>
+        <select id="mode">
+          <option value="hybrid_rerank">hybrid + semantic rerank</option>
+          <option value="vector">vector</option>
+          <option value="hybrid">hybrid</option>
+          <option value="keyword">keyword</option>
+        </select>
+      </div>
+      <button id="ask">Ask</button>
+    </div>
+
+    <div class="examples">
+      <button data-q="my phone keeps dying too fast">my phone keeps dying too fast</button>
+      <button data-q="I'm selling my phone, how do I wipe everything off it?">wipe before selling</button>
+      <button data-q="How do I take a screenshot?">take a screenshot</button>
+      <button data-q="How do I set up Face ID?">Face ID (not in guide)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Add a document</h2>
+    <label for="key">Admin key (required for uploads, kept only in this browser tab)</label>
+    <input id="key" type="password" autocomplete="off" placeholder="Paste your X-API-Key">
+    <div class="row">
+      <div class="grow">
+        <label for="file">PDF, up to 15 MB and 200 pages. Same file name replaces the old version.</label>
+        <input id="file" type="file" accept="application/pdf,.pdf">
+      </div>
+      <button id="upload">Upload</button>
+    </div>
+    <div id="uploadStatus" class="status"></div>
+  </div>
+
+  <div id="thread"></div>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const STORE = "apple-rag-key";
+
+  // Key lives in sessionStorage only: gone when the tab closes, never in the page source.
+  try { $("key").value = sessionStorage.getItem(STORE) || ""; } catch (_) {}
+  $("key").addEventListener("change", () => {
+    try { sessionStorage.setItem(STORE, $("key").value.trim()); } catch (_) {}
+  });
+
+  document.querySelectorAll(".examples button").forEach((b) =>
+    b.addEventListener("click", () => { $("question").value = b.dataset.q; ask(); }));
+  $("ask").addEventListener("click", ask);
+  $("upload").addEventListener("click", upload);
+  $("question").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
+  });
+
+  const key = () => $("key").value.trim();
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;   // textContent: never interpret server text as HTML
+    return n;
+  }
+
+  function errorText(status, data) {
+    if (status === 401) return "Invalid or missing admin key (needed for uploads).";
+    if (status === 429) return (data && data.detail) || "Too many requests. Please wait a moment.";
+    return `Error ${status}: ${(data && data.detail) || "request failed"}`;
+  }
+
+  async function loadDocuments() {
+    try {
+      const res = await fetch("/documents");
+      if (!res.ok) return;
+      const docs = await res.json();
+      const select = $("doc"), current = select.value;
+      select.replaceChildren(el("option", "", "All documents"));
+      select.firstChild.value = "";
+      docs.forEach((d) => {
+        const o = el("option", "", `${d.source} (${d.chunks} chunks)`);
+        o.value = d.source;
+        select.append(o);
+      });
+      select.value = docs.some((d) => d.source === current) ? current : "";
+    } catch (_) {}
+  }
+
+  async function ask() {
+    const question = $("question").value.trim();
+    if (question.length < 3) return;
+
+    const card = el("div", "card");
+    card.append(el("div", "q", question));
+    const answer = el("div", "a", "Thinking…");
+    card.append(answer);
+    $("thread").prepend(card);
+    $("ask").disabled = true;
+
+    try {
+      const body = { question, mode: $("mode").value };
+      if ($("doc").value) body.source = $("doc").value;
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { answer.className = "a err"; answer.textContent = errorText(res.status, data); return; }
+
+      answer.textContent = data.answer;
+      const meta = el("div", "meta");
+      meta.append(el("span", "", "Sources:"));
+      data.citations.forEach((c) => meta.append(el("span", "chip", `${c.source} · p.${c.page}`)));
+      meta.append(el("span", "", `· ${data.mode} · ${data.latency_ms} ms`));
+      card.append(meta);
+    } catch (_) {
+      answer.className = "a err";
+      answer.textContent = "Network error. Is the service running?";
+    } finally {
+      $("ask").disabled = false;
+    }
+  }
+
+  async function upload() {
+    const file = $("file").files[0], status = $("uploadStatus");
+    if (!file) { status.className = "status err"; status.textContent = "Choose a PDF first."; return; }
+
+    const form = new FormData();
+    form.append("file", file);
+    $("upload").disabled = true;
+    status.className = "status";
+    status.textContent = `Indexing ${file.name}… (reading, chunking, embedding; larger files take a minute or two)`;
+
+    try {
+      const res = await fetch("/upload", { method: "POST", headers: { "X-API-Key": key() }, body: form });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { status.className = "status err"; status.textContent = errorText(res.status, data); return; }
+      status.className = "status ok";
+      status.textContent = `Indexed "${data.source}": ${data.chunks} chunks from ${data.pages} pages in ${data.seconds}s`
+        + (data.replaced_chunks ? ` (replaced ${data.replaced_chunks} old chunks)` : "") + ".";
+      $("file").value = "";
+      await loadDocuments();
+      $("doc").value = data.source;
+    } catch (_) {
+      status.className = "status err";
+      status.textContent = "Network error during upload.";
+    } finally {
+      $("upload").disabled = false;
+    }
+  }
+
+  loadDocuments();
+</script>
+</body>
+</html>

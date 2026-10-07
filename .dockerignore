@@ -1,0 +1,15 @@
+# Secrets never go into the image
+.env
+.env.*
+
+# Not needed at runtime
+.venv/
+data/
+evals/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+CLAUDE.md
+Dockerfile
+.dockerignore

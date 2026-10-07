@@ -1,0 +1,18 @@
+# secrets: never commit
+.env
+.env.*
+!.env.example
+
+# source documents and everything derived from them (copyrighted manual; layout JSON holds its full text)
+data/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# tooling
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+*.log

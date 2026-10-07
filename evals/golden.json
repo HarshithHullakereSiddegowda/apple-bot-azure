@@ -1,0 +1,279 @@
+[
+  {
+    "id": "bluetooth-pairing",
+    "style": "direct",
+    "query": "How do I pair a Bluetooth device with my iPhone?",
+    "expected_pages": [
+      32
+    ]
+  },
+  {
+    "id": "airprint",
+    "style": "direct",
+    "query": "How do I print from my iPhone using AirPrint?",
+    "expected_pages": [
+      30
+    ]
+  },
+  {
+    "id": "restart",
+    "style": "direct",
+    "query": "How do I restart my iPhone?",
+    "expected_pages": [
+      149
+    ]
+  },
+  {
+    "id": "personal-hotspot",
+    "style": "direct",
+    "query": "What is Personal Hotspot and what do I need to use it?",
+    "expected_pages": [
+      132
+    ]
+  },
+  {
+    "id": "passcode",
+    "style": "direct",
+    "query": "How does setting a passcode protect my data?",
+    "expected_pages": [
+      33
+    ]
+  },
+  {
+    "id": "siri",
+    "style": "direct",
+    "query": "What can Siri do on my iPhone?",
+    "expected_pages": [
+      36,
+      37
+    ]
+  },
+  {
+    "id": "screenshot",
+    "style": "direct",
+    "query": "How do I take a screenshot?",
+    "expected_pages": [
+      75
+    ]
+  },
+  {
+    "id": "airplane-mode",
+    "style": "direct",
+    "query": "How do I turn on airplane mode?",
+    "expected_pages": [
+      130
+    ]
+  },
+  {
+    "id": "voiceover",
+    "style": "direct",
+    "query": "How do I turn on VoiceOver?",
+    "expected_pages": [
+      116
+    ]
+  },
+  {
+    "id": "ringtone",
+    "style": "direct",
+    "query": "How do I change my ringtone?",
+    "expected_pages": [
+      139,
+      101
+    ]
+  },
+  {
+    "id": "backup",
+    "style": "two_part",
+    "query": "How do I back up my iPhone with iCloud, and can I also back it up with iTunes?",
+    "expected_pages": [
+      150,
+      151
+    ]
+  },
+  {
+    "id": "restart-vs-reset",
+    "style": "two_part",
+    "query": "What is the difference between restarting and resetting my iPhone, and how do I force an app to close?",
+    "expected_pages": [
+      149,
+      138
+    ]
+  },
+  {
+    "id": "find-my-iphone",
+    "style": "two_part",
+    "query": "How can I find my lost iPhone and protect my data on it?",
+    "expected_pages": [
+      34
+    ]
+  },
+  {
+    "id": "battery-dying",
+    "style": "paraphrase",
+    "query": "my phone keeps dying too fast",
+    "expected_pages": [
+      34,
+      35,
+      135
+    ]
+  },
+  {
+    "id": "location-privacy",
+    "style": "paraphrase",
+    "query": "How do I stop apps from knowing where I am?",
+    "expected_pages": [
+      140
+    ]
+  },
+  {
+    "id": "parental-controls",
+    "style": "paraphrase",
+    "query": "How can I stop my child from seeing explicit content or buying apps?",
+    "expected_pages": [
+      137
+    ]
+  },
+  {
+    "id": "bigger-text",
+    "style": "paraphrase",
+    "query": "The text is too small for me to read, how can I make it bigger?",
+    "expected_pages": [
+      125
+    ]
+  },
+  {
+    "id": "frozen",
+    "style": "paraphrase",
+    "query": "My iPhone is frozen and won't respond, what should I do?",
+    "expected_pages": [
+      149
+    ]
+  },
+  {
+    "id": "wipe-before-selling",
+    "style": "paraphrase",
+    "query": "I'm selling my phone, how do I wipe everything off it?",
+    "expected_pages": [
+      138
+    ]
+  },
+  {
+    "id": "quiet-at-night",
+    "style": "paraphrase",
+    "query": "How do I silence calls and notifications at night?",
+    "expected_pages": [
+      10,
+      132
+    ]
+  },
+  {
+    "id": "magnify-screen",
+    "style": "paraphrase",
+    "query": "How do I magnify the whole screen?",
+    "expected_pages": [
+      125
+    ]
+  },
+  {
+    "id": "share-internet",
+    "style": "paraphrase",
+    "query": "Can I share my phone's internet with my laptop?",
+    "expected_pages": [
+      132
+    ]
+  },
+  {
+    "id": "reading-list",
+    "style": "synonym",
+    "query": "How do I save a webpage to read later?",
+    "expected_pages": [
+      56
+    ]
+  },
+  {
+    "id": "iphone17-price",
+    "style": "out_of_scope",
+    "query": "What is the price of the iPhone 17?",
+    "expected_pages": [],
+    "expect_refusal": true
+  },
+  {
+    "id": "face-id",
+    "style": "out_of_scope",
+    "query": "How do I set up Face ID?",
+    "expected_pages": [],
+    "expect_refusal": true
+  },
+  {
+    "id": "lte-icon",
+    "style": "table",
+    "query": "What does the LTE icon in the status bar mean?",
+    "expected_pages": [
+      10
+    ]
+  },
+  {
+    "id": "gprs-icon",
+    "style": "table",
+    "query": "What does the GPRS icon at the top of the screen mean?",
+    "expected_pages": [
+      11
+    ]
+  },
+  {
+    "id": "no-service",
+    "style": "table",
+    "query": "Why does my status bar say No service instead of showing bars?",
+    "expected_pages": [
+      10
+    ]
+  },
+  {
+    "id": "warranty-service",
+    "style": "table",
+    "query": "Where do I go to get warranty service for my iPhone?",
+    "expected_pages": [
+      153
+    ]
+  },
+  {
+    "id": "regulatory-info",
+    "style": "table",
+    "query": "Where can I find the regulatory information on my iPhone?",
+    "expected_pages": [
+      153
+    ]
+  },
+  {
+    "id": "insert-sim",
+    "style": "figure",
+    "query": "How do I insert a SIM card into iPhone 5? What tool do I need?",
+    "expected_pages": [
+      12
+    ]
+  },
+  {
+    "id": "volume-buttons",
+    "style": "figure",
+    "query": "Where are the volume buttons on the iPhone?",
+    "expected_pages": [
+      9
+    ]
+  },
+  {
+    "id": "device-overview",
+    "style": "figure",
+    "query": "What buttons and parts are shown in the iPhone 5 overview?",
+    "expected_pages": [
+      7
+    ]
+  },
+  {
+    "id": "charge-wall",
+    "style": "figure",
+    "query": "How do I charge my iPhone from a wall outlet?",
+    "expected_pages": [
+      34
+    ]
+  }
+]

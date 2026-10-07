@@ -1,0 +1,2189 @@
+{
+  "retrieval": {
+    "keyword": {
+      "hit_at_5": 0.75,
+      "mrr": 0.63125,
+      "by_style": {
+        "direct": 0.8,
+        "two_part": 1.0,
+        "paraphrase": 0.4444444444444444,
+        "synonym": 1.0,
+        "table": 0.8,
+        "figure": 1.0
+      },
+      "misses": [
+        "restart",
+        "voiceover",
+        "location-privacy",
+        "frozen",
+        "wipe-before-selling",
+        "magnify-screen",
+        "share-internet",
+        "regulatory-info"
+      ],
+      "rows": [
+        {
+          "id": "bluetooth-pairing",
+          "style": "direct",
+          "pages": [
+            32,
+            132,
+            39,
+            32,
+            38
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airprint",
+          "style": "direct",
+          "pages": [
+            73,
+            30,
+            53,
+            30,
+            112
+          ],
+          "rank": 2
+        },
+        {
+          "id": "restart",
+          "style": "direct",
+          "pages": [
+            38,
+            39,
+            39,
+            34,
+            102
+          ],
+          "rank": null
+        },
+        {
+          "id": "personal-hotspot",
+          "style": "direct",
+          "pages": [
+            11,
+            132,
+            38,
+            5,
+            132
+          ],
+          "rank": 2
+        },
+        {
+          "id": "passcode",
+          "style": "direct",
+          "pages": [
+            33,
+            140,
+            34,
+            54,
+            137
+          ],
+          "rank": 1
+        },
+        {
+          "id": "siri",
+          "style": "direct",
+          "pages": [
+            39,
+            37,
+            39,
+            38,
+            38
+          ],
+          "rank": 2
+        },
+        {
+          "id": "screenshot",
+          "style": "direct",
+          "pages": [
+            75,
+            38,
+            147,
+            41,
+            39
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airplane-mode",
+          "style": "direct",
+          "pages": [
+            44,
+            130,
+            10,
+            50,
+            10
+          ],
+          "rank": 2
+        },
+        {
+          "id": "voiceover",
+          "style": "direct",
+          "pages": [
+            39,
+            38,
+            122,
+            123,
+            124
+          ],
+          "rank": null
+        },
+        {
+          "id": "ringtone",
+          "style": "direct",
+          "pages": [
+            101,
+            38,
+            39,
+            102,
+            39
+          ],
+          "rank": 1
+        },
+        {
+          "id": "backup",
+          "style": "two_part",
+          "pages": [
+            150,
+            150,
+            150,
+            39,
+            15
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart-vs-reset",
+          "style": "two_part",
+          "pages": [
+            149,
+            38,
+            149,
+            39,
+            34
+          ],
+          "rank": 1
+        },
+        {
+          "id": "find-my-iphone",
+          "style": "two_part",
+          "pages": [
+            34,
+            34,
+            15,
+            137,
+            39
+          ],
+          "rank": 1
+        },
+        {
+          "id": "battery-dying",
+          "style": "paraphrase",
+          "pages": [
+            49,
+            34,
+            37,
+            37,
+            59
+          ],
+          "rank": 2
+        },
+        {
+          "id": "location-privacy",
+          "style": "paraphrase",
+          "pages": [
+            38,
+            18,
+            148,
+            39,
+            37
+          ],
+          "rank": null
+        },
+        {
+          "id": "parental-controls",
+          "style": "paraphrase",
+          "pages": [
+            137,
+            137,
+            137,
+            39,
+            58
+          ],
+          "rank": 1
+        },
+        {
+          "id": "bigger-text",
+          "style": "paraphrase",
+          "pages": [
+            39,
+            38,
+            42,
+            41,
+            125
+          ],
+          "rank": 5
+        },
+        {
+          "id": "frozen",
+          "style": "paraphrase",
+          "pages": [
+            39,
+            38,
+            39,
+            38,
+            34
+          ],
+          "rank": null
+        },
+        {
+          "id": "wipe-before-selling",
+          "style": "paraphrase",
+          "pages": [
+            39,
+            38,
+            49,
+            147,
+            15
+          ],
+          "rank": null
+        },
+        {
+          "id": "quiet-at-night",
+          "style": "paraphrase",
+          "pages": [
+            10,
+            132,
+            132,
+            10,
+            135
+          ],
+          "rank": 1
+        },
+        {
+          "id": "magnify-screen",
+          "style": "paraphrase",
+          "pages": [
+            38,
+            19,
+            39,
+            10,
+            28
+          ],
+          "rank": null
+        },
+        {
+          "id": "share-internet",
+          "style": "paraphrase",
+          "pages": [
+            34,
+            100,
+            71,
+            34,
+            15
+          ],
+          "rank": null
+        },
+        {
+          "id": "reading-list",
+          "style": "synonym",
+          "pages": [
+            56,
+            72,
+            72,
+            56,
+            56
+          ],
+          "rank": 1
+        },
+        {
+          "id": "lte-icon",
+          "style": "table",
+          "pages": [
+            10,
+            135,
+            19,
+            32,
+            55
+          ],
+          "rank": 1
+        },
+        {
+          "id": "gprs-icon",
+          "style": "table",
+          "pages": [
+            56,
+            11,
+            132,
+            118,
+            117
+          ],
+          "rank": 2
+        },
+        {
+          "id": "no-service",
+          "style": "table",
+          "pages": [
+            10,
+            25,
+            130,
+            7,
+            32
+          ],
+          "rank": 1
+        },
+        {
+          "id": "warranty-service",
+          "style": "table",
+          "pages": [
+            153,
+            39,
+            152,
+            38,
+            34
+          ],
+          "rank": 1
+        },
+        {
+          "id": "regulatory-info",
+          "style": "table",
+          "pages": [
+            34,
+            34,
+            39,
+            137,
+            40
+          ],
+          "rank": null
+        },
+        {
+          "id": "insert-sim",
+          "style": "figure",
+          "pages": [
+            12,
+            38,
+            13,
+            12,
+            39
+          ],
+          "rank": 1
+        },
+        {
+          "id": "volume-buttons",
+          "style": "figure",
+          "pages": [
+            9,
+            75,
+            7,
+            105,
+            117
+          ],
+          "rank": 1
+        },
+        {
+          "id": "device-overview",
+          "style": "figure",
+          "pages": [
+            7,
+            2,
+            80,
+            65,
+            58
+          ],
+          "rank": 1
+        },
+        {
+          "id": "charge-wall",
+          "style": "figure",
+          "pages": [
+            34,
+            147,
+            38,
+            39,
+            147
+          ],
+          "rank": 1
+        }
+      ]
+    },
+    "vector": {
+      "hit_at_5": 1.0,
+      "mrr": 0.9166666666666666,
+      "by_style": {
+        "direct": 1.0,
+        "two_part": 1.0,
+        "paraphrase": 1.0,
+        "synonym": 1.0,
+        "table": 1.0,
+        "figure": 1.0
+      },
+      "misses": [],
+      "rows": [
+        {
+          "id": "bluetooth-pairing",
+          "style": "direct",
+          "pages": [
+            32,
+            32,
+            32,
+            46,
+            131
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airprint",
+          "style": "direct",
+          "pages": [
+            30,
+            112,
+            73,
+            30,
+            131
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart",
+          "style": "direct",
+          "pages": [
+            149,
+            149,
+            8,
+            152,
+            149
+          ],
+          "rank": 1
+        },
+        {
+          "id": "personal-hotspot",
+          "style": "direct",
+          "pages": [
+            132,
+            135,
+            132,
+            135,
+            5
+          ],
+          "rank": 1
+        },
+        {
+          "id": "passcode",
+          "style": "direct",
+          "pages": [
+            33,
+            137,
+            33,
+            39,
+            85
+          ],
+          "rank": 1
+        },
+        {
+          "id": "siri",
+          "style": "direct",
+          "pages": [
+            36,
+            36,
+            37,
+            39,
+            39
+          ],
+          "rank": 1
+        },
+        {
+          "id": "screenshot",
+          "style": "direct",
+          "pages": [
+            9,
+            75,
+            75,
+            72,
+            75
+          ],
+          "rank": 2
+        },
+        {
+          "id": "airplane-mode",
+          "style": "direct",
+          "pages": [
+            130,
+            50,
+            5,
+            130,
+            135
+          ],
+          "rank": 1
+        },
+        {
+          "id": "voiceover",
+          "style": "direct",
+          "pages": [
+            116,
+            123,
+            116,
+            116,
+            121
+          ],
+          "rank": 1
+        },
+        {
+          "id": "ringtone",
+          "style": "direct",
+          "pages": [
+            49,
+            128,
+            48,
+            139,
+            127
+          ],
+          "rank": 4
+        },
+        {
+          "id": "backup",
+          "style": "two_part",
+          "pages": [
+            150,
+            151,
+            151,
+            14,
+            151
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart-vs-reset",
+          "style": "two_part",
+          "pages": [
+            149,
+            138,
+            17,
+            139,
+            137
+          ],
+          "rank": 1
+        },
+        {
+          "id": "find-my-iphone",
+          "style": "two_part",
+          "pages": [
+            34,
+            33,
+            34,
+            137,
+            33
+          ],
+          "rank": 1
+        },
+        {
+          "id": "battery-dying",
+          "style": "paraphrase",
+          "pages": [
+            35,
+            146,
+            149,
+            35,
+            34
+          ],
+          "rank": 1
+        },
+        {
+          "id": "location-privacy",
+          "style": "paraphrase",
+          "pages": [
+            140,
+            140,
+            146,
+            79,
+            127
+          ],
+          "rank": 1
+        },
+        {
+          "id": "parental-controls",
+          "style": "paraphrase",
+          "pages": [
+            137,
+            137,
+            137,
+            95,
+            97
+          ],
+          "rank": 1
+        },
+        {
+          "id": "bigger-text",
+          "style": "paraphrase",
+          "pages": [
+            125,
+            115,
+            110,
+            120,
+            125
+          ],
+          "rank": 1
+        },
+        {
+          "id": "frozen",
+          "style": "paraphrase",
+          "pages": [
+            149,
+            149,
+            149,
+            146,
+            146
+          ],
+          "rank": 1
+        },
+        {
+          "id": "wipe-before-selling",
+          "style": "paraphrase",
+          "pages": [
+            138,
+            151,
+            137,
+            153,
+            152
+          ],
+          "rank": 1
+        },
+        {
+          "id": "quiet-at-night",
+          "style": "paraphrase",
+          "pages": [
+            132,
+            44,
+            132,
+            10,
+            133
+          ],
+          "rank": 1
+        },
+        {
+          "id": "magnify-screen",
+          "style": "paraphrase",
+          "pages": [
+            125,
+            125,
+            19,
+            19,
+            9
+          ],
+          "rank": 1
+        },
+        {
+          "id": "share-internet",
+          "style": "paraphrase",
+          "pages": [
+            132,
+            135,
+            10,
+            135,
+            13
+          ],
+          "rank": 1
+        },
+        {
+          "id": "reading-list",
+          "style": "synonym",
+          "pages": [
+            56,
+            56,
+            56,
+            55,
+            56
+          ],
+          "rank": 1
+        },
+        {
+          "id": "lte-icon",
+          "style": "table",
+          "pages": [
+            10,
+            11,
+            10,
+            11,
+            135
+          ],
+          "rank": 1
+        },
+        {
+          "id": "gprs-icon",
+          "style": "table",
+          "pages": [
+            11,
+            11,
+            10,
+            10,
+            135
+          ],
+          "rank": 1
+        },
+        {
+          "id": "no-service",
+          "style": "table",
+          "pages": [
+            10,
+            133,
+            11,
+            11,
+            79
+          ],
+          "rank": 1
+        },
+        {
+          "id": "warranty-service",
+          "style": "table",
+          "pages": [
+            153,
+            152,
+            146,
+            153,
+            153
+          ],
+          "rank": 1
+        },
+        {
+          "id": "regulatory-info",
+          "style": "table",
+          "pages": [
+            152,
+            134,
+            153,
+            152,
+            134
+          ],
+          "rank": 3
+        },
+        {
+          "id": "insert-sim",
+          "style": "figure",
+          "pages": [
+            12,
+            13,
+            12,
+            8,
+            12
+          ],
+          "rank": 1
+        },
+        {
+          "id": "volume-buttons",
+          "style": "figure",
+          "pages": [
+            9,
+            31,
+            9,
+            60,
+            128
+          ],
+          "rank": 1
+        },
+        {
+          "id": "device-overview",
+          "style": "figure",
+          "pages": [
+            7,
+            2,
+            8,
+            11,
+            9
+          ],
+          "rank": 1
+        },
+        {
+          "id": "charge-wall",
+          "style": "figure",
+          "pages": [
+            147,
+            35,
+            13,
+            34,
+            8
+          ],
+          "rank": 4
+        }
+      ]
+    },
+    "hybrid": {
+      "hit_at_5": 0.9375,
+      "mrr": 0.8328125,
+      "by_style": {
+        "direct": 0.9,
+        "two_part": 1.0,
+        "paraphrase": 0.8888888888888888,
+        "synonym": 1.0,
+        "table": 1.0,
+        "figure": 1.0
+      },
+      "misses": [
+        "siri",
+        "wipe-before-selling"
+      ],
+      "rows": [
+        {
+          "id": "bluetooth-pairing",
+          "style": "direct",
+          "pages": [
+            32,
+            32,
+            132,
+            32,
+            46
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airprint",
+          "style": "direct",
+          "pages": [
+            30,
+            73,
+            30,
+            112,
+            112
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart",
+          "style": "direct",
+          "pages": [
+            34,
+            124,
+            44,
+            152,
+            149
+          ],
+          "rank": 5
+        },
+        {
+          "id": "personal-hotspot",
+          "style": "direct",
+          "pages": [
+            132,
+            132,
+            11,
+            135,
+            5
+          ],
+          "rank": 1
+        },
+        {
+          "id": "passcode",
+          "style": "direct",
+          "pages": [
+            33,
+            137,
+            137,
+            136,
+            54
+          ],
+          "rank": 1
+        },
+        {
+          "id": "siri",
+          "style": "direct",
+          "pages": [
+            39,
+            38,
+            39,
+            39,
+            38
+          ],
+          "rank": null
+        },
+        {
+          "id": "screenshot",
+          "style": "direct",
+          "pages": [
+            75,
+            9,
+            75,
+            74,
+            74
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airplane-mode",
+          "style": "direct",
+          "pages": [
+            130,
+            50,
+            44,
+            10,
+            5
+          ],
+          "rank": 1
+        },
+        {
+          "id": "voiceover",
+          "style": "direct",
+          "pages": [
+            116,
+            122,
+            116,
+            123,
+            116
+          ],
+          "rank": 1
+        },
+        {
+          "id": "ringtone",
+          "style": "direct",
+          "pages": [
+            49,
+            101,
+            139,
+            10,
+            133
+          ],
+          "rank": 2
+        },
+        {
+          "id": "backup",
+          "style": "two_part",
+          "pages": [
+            150,
+            151,
+            150,
+            14,
+            151
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart-vs-reset",
+          "style": "two_part",
+          "pages": [
+            149,
+            149,
+            21,
+            137,
+            132
+          ],
+          "rank": 1
+        },
+        {
+          "id": "find-my-iphone",
+          "style": "two_part",
+          "pages": [
+            34,
+            34,
+            15,
+            33,
+            13
+          ],
+          "rank": 1
+        },
+        {
+          "id": "battery-dying",
+          "style": "paraphrase",
+          "pages": [
+            34,
+            50,
+            43,
+            135,
+            43
+          ],
+          "rank": 1
+        },
+        {
+          "id": "location-privacy",
+          "style": "paraphrase",
+          "pages": [
+            39,
+            18,
+            132,
+            127,
+            140
+          ],
+          "rank": 5
+        },
+        {
+          "id": "parental-controls",
+          "style": "paraphrase",
+          "pages": [
+            137,
+            137,
+            137,
+            97,
+            137
+          ],
+          "rank": 1
+        },
+        {
+          "id": "bigger-text",
+          "style": "paraphrase",
+          "pages": [
+            125,
+            125,
+            123,
+            23,
+            120
+          ],
+          "rank": 1
+        },
+        {
+          "id": "frozen",
+          "style": "paraphrase",
+          "pages": [
+            34,
+            38,
+            46,
+            149,
+            149
+          ],
+          "rank": 4
+        },
+        {
+          "id": "wipe-before-selling",
+          "style": "paraphrase",
+          "pages": [
+            153,
+            50,
+            140,
+            34,
+            50
+          ],
+          "rank": null
+        },
+        {
+          "id": "quiet-at-night",
+          "style": "paraphrase",
+          "pages": [
+            132,
+            10,
+            132,
+            44,
+            133
+          ],
+          "rank": 1
+        },
+        {
+          "id": "magnify-screen",
+          "style": "paraphrase",
+          "pages": [
+            19,
+            125,
+            19,
+            122,
+            125
+          ],
+          "rank": 2
+        },
+        {
+          "id": "share-internet",
+          "style": "paraphrase",
+          "pages": [
+            132,
+            63,
+            10,
+            135,
+            142
+          ],
+          "rank": 1
+        },
+        {
+          "id": "reading-list",
+          "style": "synonym",
+          "pages": [
+            56,
+            56,
+            72,
+            56,
+            72
+          ],
+          "rank": 1
+        },
+        {
+          "id": "lte-icon",
+          "style": "table",
+          "pages": [
+            10,
+            135,
+            10,
+            128,
+            130
+          ],
+          "rank": 1
+        },
+        {
+          "id": "gprs-icon",
+          "style": "table",
+          "pages": [
+            11,
+            10,
+            128,
+            11,
+            132
+          ],
+          "rank": 1
+        },
+        {
+          "id": "no-service",
+          "style": "table",
+          "pages": [
+            10,
+            124,
+            133,
+            130,
+            140
+          ],
+          "rank": 1
+        },
+        {
+          "id": "warranty-service",
+          "style": "table",
+          "pages": [
+            153,
+            152,
+            152,
+            146,
+            50
+          ],
+          "rank": 1
+        },
+        {
+          "id": "regulatory-info",
+          "style": "table",
+          "pages": [
+            153,
+            134,
+            152,
+            133,
+            34
+          ],
+          "rank": 1
+        },
+        {
+          "id": "insert-sim",
+          "style": "figure",
+          "pages": [
+            12,
+            13,
+            12,
+            12,
+            8
+          ],
+          "rank": 1
+        },
+        {
+          "id": "volume-buttons",
+          "style": "figure",
+          "pages": [
+            9,
+            105,
+            7,
+            31,
+            117
+          ],
+          "rank": 1
+        },
+        {
+          "id": "device-overview",
+          "style": "figure",
+          "pages": [
+            7,
+            2,
+            31,
+            8,
+            9
+          ],
+          "rank": 1
+        },
+        {
+          "id": "charge-wall",
+          "style": "figure",
+          "pages": [
+            34,
+            147,
+            35,
+            148,
+            147
+          ],
+          "rank": 1
+        }
+      ]
+    },
+    "hybrid_rerank": {
+      "hit_at_5": 0.96875,
+      "mrr": 0.8828125,
+      "by_style": {
+        "direct": 1.0,
+        "two_part": 1.0,
+        "paraphrase": 0.8888888888888888,
+        "synonym": 1.0,
+        "table": 1.0,
+        "figure": 1.0
+      },
+      "misses": [
+        "wipe-before-selling"
+      ],
+      "rows": [
+        {
+          "id": "bluetooth-pairing",
+          "style": "direct",
+          "pages": [
+            32,
+            132,
+            46,
+            131,
+            131
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airprint",
+          "style": "direct",
+          "pages": [
+            30,
+            112,
+            73,
+            112,
+            75
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart",
+          "style": "direct",
+          "pages": [
+            149,
+            149,
+            8,
+            149,
+            138
+          ],
+          "rank": 1
+        },
+        {
+          "id": "personal-hotspot",
+          "style": "direct",
+          "pages": [
+            132,
+            135,
+            132,
+            135,
+            11
+          ],
+          "rank": 1
+        },
+        {
+          "id": "passcode",
+          "style": "direct",
+          "pages": [
+            33,
+            33,
+            136,
+            137,
+            33
+          ],
+          "rank": 1
+        },
+        {
+          "id": "siri",
+          "style": "direct",
+          "pages": [
+            124,
+            36,
+            124,
+            39,
+            36
+          ],
+          "rank": 2
+        },
+        {
+          "id": "screenshot",
+          "style": "direct",
+          "pages": [
+            75,
+            117,
+            119,
+            70,
+            125
+          ],
+          "rank": 1
+        },
+        {
+          "id": "airplane-mode",
+          "style": "direct",
+          "pages": [
+            130,
+            44,
+            50,
+            11,
+            10
+          ],
+          "rank": 1
+        },
+        {
+          "id": "voiceover",
+          "style": "direct",
+          "pages": [
+            116,
+            39,
+            122,
+            118,
+            118
+          ],
+          "rank": 1
+        },
+        {
+          "id": "ringtone",
+          "style": "direct",
+          "pages": [
+            49,
+            139,
+            101,
+            50,
+            128
+          ],
+          "rank": 2
+        },
+        {
+          "id": "backup",
+          "style": "two_part",
+          "pages": [
+            150,
+            152,
+            150,
+            152,
+            15
+          ],
+          "rank": 1
+        },
+        {
+          "id": "restart-vs-reset",
+          "style": "two_part",
+          "pages": [
+            149,
+            149,
+            6,
+            149,
+            138
+          ],
+          "rank": 1
+        },
+        {
+          "id": "find-my-iphone",
+          "style": "two_part",
+          "pages": [
+            34,
+            15,
+            34,
+            150,
+            151
+          ],
+          "rank": 1
+        },
+        {
+          "id": "battery-dying",
+          "style": "paraphrase",
+          "pages": [
+            135,
+            135,
+            35,
+            148,
+            149
+          ],
+          "rank": 1
+        },
+        {
+          "id": "location-privacy",
+          "style": "paraphrase",
+          "pages": [
+            140,
+            140,
+            134,
+            39,
+            79
+          ],
+          "rank": 1
+        },
+        {
+          "id": "parental-controls",
+          "style": "paraphrase",
+          "pages": [
+            137,
+            137,
+            137,
+            33,
+            134
+          ],
+          "rank": 1
+        },
+        {
+          "id": "bigger-text",
+          "style": "paraphrase",
+          "pages": [
+            110,
+            19,
+            112,
+            125,
+            125
+          ],
+          "rank": 4
+        },
+        {
+          "id": "frozen",
+          "style": "paraphrase",
+          "pages": [
+            133,
+            149,
+            149,
+            148,
+            146
+          ],
+          "rank": 2
+        },
+        {
+          "id": "wipe-before-selling",
+          "style": "paraphrase",
+          "pages": [
+            151,
+            153,
+            151,
+            152,
+            97
+          ],
+          "rank": null
+        },
+        {
+          "id": "quiet-at-night",
+          "style": "paraphrase",
+          "pages": [
+            10,
+            44,
+            10,
+            132,
+            44
+          ],
+          "rank": 1
+        },
+        {
+          "id": "magnify-screen",
+          "style": "paraphrase",
+          "pages": [
+            125,
+            125,
+            19,
+            19,
+            23
+          ],
+          "rank": 1
+        },
+        {
+          "id": "share-internet",
+          "style": "paraphrase",
+          "pages": [
+            132,
+            135,
+            132,
+            13,
+            77
+          ],
+          "rank": 1
+        },
+        {
+          "id": "reading-list",
+          "style": "synonym",
+          "pages": [
+            56,
+            56,
+            56,
+            55,
+            56
+          ],
+          "rank": 1
+        },
+        {
+          "id": "lte-icon",
+          "style": "table",
+          "pages": [
+            10,
+            10,
+            135,
+            152,
+            79
+          ],
+          "rank": 1
+        },
+        {
+          "id": "gprs-icon",
+          "style": "table",
+          "pages": [
+            11,
+            130,
+            135,
+            56,
+            128
+          ],
+          "rank": 1
+        },
+        {
+          "id": "no-service",
+          "style": "table",
+          "pages": [
+            10,
+            133,
+            133,
+            7,
+            140
+          ],
+          "rank": 1
+        },
+        {
+          "id": "warranty-service",
+          "style": "table",
+          "pages": [
+            153,
+            146,
+            146,
+            152,
+            7
+          ],
+          "rank": 1
+        },
+        {
+          "id": "regulatory-info",
+          "style": "table",
+          "pages": [
+            153,
+            134,
+            152,
+            152,
+            149
+          ],
+          "rank": 1
+        },
+        {
+          "id": "insert-sim",
+          "style": "figure",
+          "pages": [
+            12,
+            13,
+            2,
+            12,
+            8
+          ],
+          "rank": 1
+        },
+        {
+          "id": "volume-buttons",
+          "style": "figure",
+          "pages": [
+            9,
+            117,
+            9,
+            31,
+            8
+          ],
+          "rank": 1
+        },
+        {
+          "id": "device-overview",
+          "style": "figure",
+          "pages": [
+            7,
+            8,
+            31,
+            2,
+            11
+          ],
+          "rank": 1
+        },
+        {
+          "id": "charge-wall",
+          "style": "figure",
+          "pages": [
+            147,
+            34,
+            8,
+            147,
+            148
+          ],
+          "rank": 2
+        }
+      ]
+    }
+  },
+  "answers": [
+    {
+      "id": "bluetooth-pairing",
+      "style": "direct",
+      "answer": "To pair a Bluetooth device with your iPhone, follow these steps:\n\n1. Make the Bluetooth device discoverable. Refer to the documentation that came with the device for instructions. For example, for an Apple Wireless Keyboard, press the On/off switch.  \n2. On your iPhone, go to Settings > Bluetooth and turn Bluetooth on.  \n3. Select the device from the list of available devices.  \n4. If prompted, enter the passkey or PIN as instructed in the device's documentation.  \n\n(Reference: iPhone User Guide, page 32)",
+      "refused": false,
+      "latency_ms": 1926,
+      "tokens": 1294,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How to pair a Bluetooth device with an iPhone"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1531
+    },
+    {
+      "id": "airprint",
+      "style": "direct",
+      "answer": "To print from your iPhone using AirPrint, follow these steps:\n\n1. Make sure your iPhone and the AirPrint-enabled printer are connected to the same Wi-Fi network (iPhone User Guide, page 30).\n2. From supported apps such as Mail, Photos, Safari, iBooks, Maps, or Notes, open the item you want to print.\n3. Tap the Share icon ( or similar) or the action button within the app.\n4. Choose the Print option.\n5. Select your AirPrint-enabled printer.\n6. Adjust print settings if needed, then tap Print.\n\nFor printing photos specifically:\n- To print a single photo, tap the Share icon, then tap Print.\n- To print multiple photos, open a photo album, tap Edit, select the photos, tap Share, then tap Print (iPhone User Guide, page 73).\n\nFor printing PDFs in iBooks:\n- Open the PDF, tap the action button, then choose Print (iPhone User Guide, page 112).\n\nFor more details, see \"Printing with AirPrint\" on page 30 of the iPhone User Guide.",
+      "refused": false,
+      "latency_ms": 2841,
+      "tokens": 1302,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How to print from my iPhone using AirPrint"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1652
+    },
+    {
+      "id": "restart",
+      "style": "direct",
+      "answer": "To restart your iPhone, follow these steps:\n\n1. Hold down the Sleep/Wake button until the red slider appears.\n2. Slide your finger across the slider to turn off the iPhone.\n3. To turn the iPhone back on, hold down the Sleep/Wake button until the Apple logo appears.\n\nThis procedure will restart your iPhone (iPhone User Guide, page 149 and page 8).",
+      "refused": false,
+      "latency_ms": 1771,
+      "tokens": 1142,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to restart my iPhone"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1345
+    },
+    {
+      "id": "personal-hotspot",
+      "style": "direct",
+      "answer": "Personal Hotspot is a feature on iPhone 4 or later that allows you to share your iPhone's Internet connection with a computer or other devices such as an iPod touch, iPad, or another iPhone. Devices can connect to your iPhone's Internet via Wi-Fi, Bluetooth, or USB. \n\nTo use Personal Hotspot, you need:\n1. An iPhone 4 or later.\n2. Your iPhone must be connected to the Internet over the cellular data network.\n3. You may need to set up the service with your carrier by going to Settings > General > Cellular and tapping Set Up Personal Hotspot if it appears.\n4. Other devices can then connect to your iPhone via Wi-Fi by selecting your iPhone from the list of available Wi-Fi networks, via USB by connecting your iPhone to your computer with the cable, or via Bluetooth by turning on Bluetooth on your iPhone and pairing it with the device.\n\nNote that this feature may not be available in all areas and additional fees may apply; you should contact your carrier for more information (iPhone User Guide, pages 132 and 135).",
+      "refused": false,
+      "latency_ms": 2814,
+      "tokens": 1483,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "What is Personal Hotspot?",
+        "What do I need to use Personal Hotspot?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1843
+    },
+    {
+      "id": "passcode",
+      "style": "direct",
+      "answer": "Setting a passcode protects your data by enabling data protection, which uses your passcode as the key for encrypting mail messages and attachments stored on iPhone. This encryption helps prevent others from accessing your information. Additionally, if you set the option to erase data after ten failed passcode attempts, all your information and media are erased by removing the encryption key, which uses 256-bit AES encryption (iPhone User Guide, pages 33 and 137).",
+      "refused": false,
+      "latency_ms": 2374,
+      "tokens": 1298,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How does setting a passcode protect my data?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1522
+    },
+    {
+      "id": "siri",
+      "style": "direct",
+      "answer": "Siri on your iPhone can do the following:\n\n1. Help you get things done just by talking, understanding natural speech without needing specific commands or keywords.\n2. Write and send messages.\n3. Schedule meetings.\n4. Place phone calls.\n5. Get directions.\n6. Set reminders.\n7. Search the web.\n8. Open apps (e.g., \"Open Passbook\").\n9. Post to Facebook and Tweet.\n10. Set timers (e.g., \"Set the timer for 30 minutes\").\n11. Read back text messages and email messages you\u2019ve dictated before sending them.\n12. Read back the subjects of reminders before creating them.\n13. Use location-based reminders (e.g., \"Remind me to call my daughter when I leave the office\").\n14. Work with information from your contacts, music library, calendars, reminders, and more to understand your requests.\n15. Work seamlessly with most built-in apps on iPhone.\n16. Use Search and Location Services when needed.\n17. Respond via voice, especially when used with a headset.\n\nFor example, you can say commands like \"Call Joe,\" \"Directions to the nearest Apple store,\" or \"Is it going to rain tomorrow?\" (iPhone User Guide, pages 36, 39).",
+      "refused": false,
+      "latency_ms": 3688,
+      "tokens": 1323,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "What can Siri do on my iPhone?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1711
+    },
+    {
+      "id": "screenshot",
+      "style": "direct",
+      "answer": "To take a screenshot on your iPhone, press and release the Sleep/Wake button and the Home button at the same time. The screenshot will be added to your Camera Roll album (iPhone User Guide, page 75).",
+      "refused": false,
+      "latency_ms": 1728,
+      "tokens": 1028,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to take a screenshot"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1192
+    },
+    {
+      "id": "airplane-mode",
+      "style": "direct",
+      "answer": "To turn on airplane mode on your iPhone, follow these steps:\n\n1. Go to Settings.\n2. Turn on Airplane Mode.\n\nWhen airplane mode is on, an airplane icon appears in the status bar at the top of the screen. This disables phone, Wi-Fi, Bluetooth signals, and GPS reception (iPhone User Guide, page 130).",
+      "refused": false,
+      "latency_ms": 2455,
+      "tokens": 1192,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to turn on airplane mode"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1383
+    },
+    {
+      "id": "voiceover",
+      "style": "direct",
+      "answer": "To turn on VoiceOver, follow these steps:\n\n1. Go to Settings.\n2. Tap General.\n3. Tap Accessibility.\n4. Tap VoiceOver to turn it on.\n\nAlternatively, you can set Triple-click Home to turn VoiceOver on or off (see Triple-click Home on page 124) (iPhone User Guide, page 116).",
+      "refused": false,
+      "latency_ms": 1532,
+      "tokens": 1350,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How do I turn on VoiceOver?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1542
+    },
+    {
+      "id": "ringtone",
+      "style": "direct",
+      "answer": "To change your ringtone on iPhone, follow these steps:\n\n1. Go to Settings.\n2. Tap Sounds.\n3. Tap Ringtone.\n4. Choose the ringtone you want to set as your default ringtone.\n\nFor assigning a different ringtone to a specific contact:\n1. Open Contacts.\n2. Choose a contact.\n3. Tap Edit.\n4. Tap Ringtone.\n5. Choose a ringtone for that contact.\n\nFor more details, see the Sounds section on page 139 (iPhone User Guide, pages 49, 50, 139, 128).",
+      "refused": false,
+      "latency_ms": 2302,
+      "tokens": 1186,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to change my ringtone"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1419
+    },
+    {
+      "id": "backup",
+      "style": "two_part",
+      "answer": "To back up your iPhone with iCloud, follow these steps:\n\n1. Go to Settings > iCloud.\n2. Log in with your Apple ID and password, if required.\n3. Go to Storage & Backup.\n4. Turn on iCloud backups.\n\niCloud will back up your iPhone daily over Wi-Fi when it is connected to a power source and locked. It backs up purchased music, TV shows, apps, books, photos and videos in your Camera Roll, iPhone settings, app data, home screen and app organization, messages, and ringtones (iPhone User Guide, page 150).\n\nRegarding backing up with iTunes, if you choose to back up using iCloud automatically, you cannot also use iTunes to automatically back up to your computer. However, you can still use iTunes to manually back up your iPhone to your computer (iPhone User Guide, page 150).",
+      "refused": false,
+      "latency_ms": 2922,
+      "tokens": 1553,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to back up my iPhone with iCloud",
+        "whether I can also back it up with iTunes"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1873
+    },
+    {
+      "id": "restart-vs-reset",
+      "style": "two_part",
+      "answer": "The difference between restarting and resetting your iPhone is as follows:\n\n1. Restarting iPhone:\n   - Hold down the Sleep/Wake button until the red slider appears.\n   - Slide your finger across the slider to turn off iPhone.\n   - To turn iPhone back on, hold down the Sleep/Wake button until the Apple logo appears.\n   - Restarting is used to turn the device off and on again to resolve minor issues.\n\n2. Resetting iPhone:\n   - Should be done only if turning iPhone off and on doesn\u2019t resolve the problem.\n   - Hold down the Sleep/Wake button and the Home button at the same time for at least ten seconds, until the Apple logo appears.\n   - Resetting forces a reboot and can help fix more persistent problems.\n\nTo force an app to close:\n1. Hold down the Sleep/Wake button for a few seconds until a red slider appears.\n2. Then hold down the Home button until the app closes.\n3. Alternatively, you can remove an app from the recents list to force it to close (see Opening and switching between apps on page 17).\n\nThese instructions are from the iPhone User Guide, page 149.",
+      "refused": false,
+      "latency_ms": 2844,
+      "tokens": 1338,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "difference between restarting and resetting my iPhone",
+        "how to force an app to close"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1721
+    },
+    {
+      "id": "find-my-iphone",
+      "style": "two_part",
+      "answer": "To find your lost iPhone and protect your data, follow these steps:\n\n1. Ensure that Find My iPhone was turned on in iCloud settings on your iPhone before it was lost. To turn it on, go to Settings > iCloud, then turn on Find My iPhone (iPhone User Guide, page 34).\n\n2. Use the free Find My iPhone app on another iPhone, iPad, or iPod touch, or use a Mac or PC web browser signed in to www.icloud.com.\n\n3. In the Find My iPhone app or on iCloud.com, you can:\n   - Play Sound: Play a sound on your iPhone for two minutes to help locate it.\n   - Lost Mode: Immediately lock your missing iPhone with a passcode and send it a message displaying a contact number. Your iPhone will also track and report its location.\n   - Erase iPhone: Protect your privacy by erasing all the information and media on your iPhone and restoring it to its original factory settings (iPhone User Guide, page 34).\n\nImportant: Your iPhone must be connected to the Internet for these features to work (iPhone User Guide, page 34).",
+      "refused": false,
+      "latency_ms": 3553,
+      "tokens": 1397,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to find my lost iPhone",
+        "how to protect my data on the lost iPhone"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1776
+    },
+    {
+      "id": "battery-dying",
+      "style": "paraphrase",
+      "answer": "If your iPhone battery is dying too fast, consider the following steps based on the provided information:\n\n1. Turn off 3G if you are making a lot of phone calls, as using 3G may decrease battery performance (iPhone User Guide, page 135).\n2. Turn off Cellular Data for services you do not need to use cellular data with, so the iPhone will use only Wi-Fi for those services (iPhone User Guide, page 135).\n3. Avoid using Data Roaming or Voice Roaming if not necessary, as these can increase battery usage (iPhone User Guide, page 135).\n4. Make sure you are using the iPhone within the recommended operating temperature range (32\u00b0 to 95\u00b0 F or 0\u00b0 to 35\u00b0 C) because extreme temperatures can shorten battery life (iPhone User Guide, page 148).\n5. If the battery is very old, it may have a limited number of charge cycles and might need to be replaced by an authorized service provider (iPhone User Guide, page 35).\n\nFollowing these steps may help extend your iPhone's battery life. If problems persist, consider contacting Apple support for further assistance (iPhone User Guide, page 149).",
+      "refused": false,
+      "latency_ms": 2992,
+      "tokens": 1283,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "why my phone keeps dying too fast",
+        "how to fix or improve battery life"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1673
+    },
+    {
+      "id": "location-privacy",
+      "style": "paraphrase",
+      "answer": "To stop apps from knowing where you are, you need to turn off Location Services or restrict it for specific apps. Here are the steps:\n\n1. Go to Settings > Privacy > Location Services.\n2. You can turn off Location Services entirely by toggling it off, which stops all apps and services from accessing your location.\n3. Alternatively, you can turn off Location Services for individual apps by selecting the app in the list and choosing \"Never\" or another option that restricts location access.\n4. To turn off Location Services for system services, go to Settings > Privacy > Location Services > System Services and toggle off the services you want to restrict.\n\nNote: If you turn off Location Services, you will be prompted to turn it on again the next time an app or service tries to use it (iPhone User Guide, page 140).",
+      "refused": false,
+      "latency_ms": 2216,
+      "tokens": 1232,
+      "groundedness": 0.8,
+      "unsupported": [
+        "Alternatively, you can turn off Location Services for individual apps by selecting the app in the list and choosing \"Never\" or another option that restricts location access."
+      ],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How to stop apps from knowing where I am"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1557
+    },
+    {
+      "id": "parental-controls",
+      "style": "paraphrase",
+      "answer": "To stop your child from seeing explicit content or buying apps on your iPhone, follow these steps:\n\n1. Turn on Restrictions:\n   - Go to Settings > General > Restrictions.\n   - Tap Enable Restrictions.\n   - Define a restrictions passcode (different from the device unlock passcode).\n\n2. Restrict explicit content:\n   - Under Content Restrictions, tap Ratings For.\n   - Select your country.\n   - Set restrictions for music, podcasts, movies, TV shows, and apps so that content with explicit ratings won't appear on the iPhone.\n\n3. Prevent app purchases:\n   - Turn off In-App Purchases to prevent buying additional content or functionality within apps.\n   - Enable Require Passwords to require entering your Apple ID for in-app purchases after a specified time period.\n\n4. Disable installing and deleting apps:\n   - Restrict Installing Apps to disable the App Store and remove its icon.\n   - Restrict Deleting Apps to prevent apps from being deleted.\n\n5. Restrict explicit language in Siri:\n   - Enable the Explicit Language restriction so Siri replaces explicit words with asterisks and beep sounds.\n\nThese settings will help control explicit content visibility and prevent unauthorized app purchases (iPhone User Guide, page 137).",
+      "refused": false,
+      "latency_ms": 3370,
+      "tokens": 1474,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How can I stop my child from seeing explicit content?",
+        "How can I stop my child from buying apps?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1856
+    },
+    {
+      "id": "bigger-text",
+      "style": "paraphrase",
+      "answer": "To make the text bigger on your iPhone, follow these steps:\n\n1. Go to Settings > General > Accessibility > Large Text.\n2. Set the text size to your preferred larger size.\n\nThis will increase the text size in alerts, and in apps like Calendar, Contacts, Mail, Messages, and Notes (iPhone User Guide, page 125).",
+      "refused": false,
+      "latency_ms": 1435,
+      "tokens": 977,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to make the text bigger"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1168
+    },
+    {
+      "id": "frozen",
+      "style": "paraphrase",
+      "answer": "To fix a frozen iPhone that won't respond, follow these steps:\n\n1. Try restarting the iPhone:\n   - Hold down the Sleep/Wake button until the red slider appears.\n   - Slide your finger across the slider to turn off the iPhone.\n   - To turn it back on, hold down the Sleep/Wake button until the Apple logo appears.\n\n2. If restarting doesn't work, try forcing an app to close:\n   - Hold down the Sleep/Wake button for a few seconds until the red slider appears.\n   - Then hold down the Home button until the app closes.\n\n3. If you can\u2019t turn off the iPhone or the problem continues, reset the iPhone:\n   - Hold down the Sleep/Wake button and the Home button at the same time for at least ten seconds, until the Apple logo appears.\n\nA reset should be done only if turning the iPhone off and on doesn\u2019t resolve the problem (iPhone User Guide, pages 149).",
+      "refused": false,
+      "latency_ms": 3074,
+      "tokens": 1197,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "what should I do if my iPhone is frozen and won't respond"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1530
+    },
+    {
+      "id": "wipe-before-selling",
+      "style": "paraphrase",
+      "answer": "To wipe everything off your iPhone before selling it, follow these steps:\n\n1. Erase all content and settings by performing a reset on your iPhone. This will delete all apps, data, and settings. (See Reset on page 138 as referenced in the excerpts.)\n2. You can reset your iPhone by going to Settings and selecting the reset option to erase all content and settings. (iPhone User Guide, page 152)\n3. After resetting, the iPhone will be restored to factory settings, removing your personal data.\n\nThis process ensures that all your data is removed from the device before you sell it. (iPhone User Guide, page 152 and page 97)",
+      "refused": false,
+      "latency_ms": 2719,
+      "tokens": 1162,
+      "groundedness": 0.75,
+      "unsupported": [
+        "After resetting, the iPhone will be restored to factory settings, removing your personal data."
+      ],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to wipe everything off the phone before selling it"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1445
+    },
+    {
+      "id": "quiet-at-night",
+      "style": "paraphrase",
+      "answer": "To silence calls and notifications at night, you can use the Do Not Disturb feature by following these steps:\n\n1. Go to Settings on your iPhone.\n2. Turn on Do Not Disturb.\n3. To schedule quiet hours, go to Settings > Notifications > Do Not Disturb.\n4. Turn on Scheduled, then set the time when you don\u2019t want to be disturbed. iPhone will automatically turn on Do Not Disturb during this period each day.\n5. Optionally, you can allow calls from certain people to ring by tapping Allow Calls From and selecting your preferences.\n6. When Do Not Disturb is on and the iPhone is locked, all notifications and calls are silenced, but alarms will still sound (iPhone User Guide, pages 10 and 132).\n\nAlternatively, you can also flip the Ring/Silent switch on the side of your iPhone to silent mode, which stops the iPhone from ringing or playing alerts and other sound effects, though alarms and some app sounds will still play (iPhone User Guide, page 10).",
+      "refused": false,
+      "latency_ms": 3080,
+      "tokens": 1440,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How to silence calls and notifications at night"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1786
+    },
+    {
+      "id": "magnify-screen",
+      "style": "paraphrase",
+      "answer": "To magnify the whole screen on your iPhone, follow these steps:\n\n1. Go to Settings > General > Accessibility > Zoom.\n2. Turn Zoom on.\n3. To zoom in or out, double-tap the screen with three fingers.\n4. To vary the magnification, with three fingers, tap and drag up or down without lifting your fingers on the second tap.\n5. To pan around the screen while zoomed in, drag the screen with three fingers. After starting the drag, you can use a single finger to move around.\n\nYou can also turn Zoom on or off using the Triple-click Home function (Settings > General > Accessibility > Triple-click Home) (iPhone User Guide, page 125).",
+      "refused": false,
+      "latency_ms": 2295,
+      "tokens": 1341,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How do I magnify the whole screen?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1609
+    },
+    {
+      "id": "share-internet",
+      "style": "paraphrase",
+      "answer": "Yes, you can share your iPhone's Internet connection with your laptop using Personal Hotspot. Here are the steps:\n\n1. Go to Settings > General > Cellular and tap Set Up Personal Hotspot to set up the service with your carrier (if it appears).\n2. Turn on Personal Hotspot.\n3. Connect your laptop to your iPhone's Internet in one of the following ways:\n   - Wi-Fi: On your laptop, choose your iPhone from the list of available Wi-Fi networks.\n   - USB: Connect your iPhone to your laptop using the cable that came with it. Then, in your laptop's Network preferences, choose iPhone and configure the network settings.\n   - Bluetooth: On your iPhone, go to Settings > Bluetooth and turn on Bluetooth. Pair and connect your iPhone with your laptop following your laptop's instructions.\n\nNote: Personal Hotspot works only if your iPhone is connected to the Internet over the cellular data network. Additional fees may apply, and the feature may not be available in all areas. Contact your carrier for more information (iPhone User Guide, pages 132 and 135).",
+      "refused": false,
+      "latency_ms": 2528,
+      "tokens": 1320,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "Can I share my phone's internet with my laptop?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1673
+    },
+    {
+      "id": "reading-list",
+      "style": "synonym",
+      "answer": "To save a webpage to read later on your iPhone, follow these steps:\n\n1. Tap the share button (the icon looks like a square with an arrow pointing up).\n2. Tap \"Add to Reading List.\"\n\nThis saves the current webpage to your Reading List, allowing you to read it later even without an Internet connection if you have an iPhone 4 or later (iPhone User Guide, page 56).",
+      "refused": false,
+      "latency_ms": 1561,
+      "tokens": 1222,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to save a webpage to read later"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1428
+    },
+    {
+      "id": "iphone17-price",
+      "style": "out_of_scope",
+      "answer": "I couldn't find that in the documents.",
+      "refused": true,
+      "latency_ms": 1326,
+      "tokens": 1123,
+      "correct_refusal": true
+    },
+    {
+      "id": "face-id",
+      "style": "out_of_scope",
+      "answer": "I couldn't find that in the documents.",
+      "refused": true,
+      "latency_ms": 1306,
+      "tokens": 1039,
+      "correct_refusal": true
+    },
+    {
+      "id": "lte-icon",
+      "style": "table",
+      "answer": "The LTE icon in the status bar means that your carrier\u2019s LTE network is available, and iPhone can connect to the Internet over that network (iPhone 5. Not available in all areas) (iPhone User Guide, page 10).",
+      "refused": false,
+      "latency_ms": 1647,
+      "tokens": 1023,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "What does the LTE icon in the status bar mean?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1202
+    },
+    {
+      "id": "gprs-icon",
+      "style": "table",
+      "answer": "The GPRS icon at the top of the screen shows that your carrier\u2019s GPRS (GSM) or 1xRTT (CDMA) network is available, and iPhone can connect to the Internet over that network (iPhone User Guide, page 11).",
+      "refused": false,
+      "latency_ms": 1493,
+      "tokens": 1201,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "What does the GPRS icon at the top of the screen mean?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1384
+    },
+    {
+      "id": "no-service",
+      "style": "table",
+      "answer": "Your status bar says \"No service\" instead of showing bars because your iPhone is not in range of the cellular network or cannot connect to a cellular network. This means you cannot make or receive calls. If you are outside your carrier\u2019s network and have not selected a local carrier with a roaming agreement, or if the selected network is unavailable, \"No service\" will appear on the iPhone (iPhone User Guide, pages 10 and 133).",
+      "refused": false,
+      "latency_ms": 2003,
+      "tokens": 1099,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "Why does my status bar say No service instead of showing bars?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1317
+    },
+    {
+      "id": "warranty-service",
+      "style": "table",
+      "answer": "To obtain warranty service for your iPhone, first follow the advice in the iPhone User Guide. Then go to www.apple.com/support/iphone (iPhone User Guide, page 153).",
+      "refused": false,
+      "latency_ms": 1469,
+      "tokens": 1090,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "Where do I go to get warranty service for my iPhone?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1255
+    },
+    {
+      "id": "regulatory-info",
+      "style": "table",
+      "answer": "To find the regulatory information on your iPhone, go to Settings > General > About > Legal > Regulatory (iPhone User Guide, page 153).",
+      "refused": false,
+      "latency_ms": 1441,
+      "tokens": 1121,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "Where can I find the regulatory information on my iPhone?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1277
+    },
+    {
+      "id": "insert-sim",
+      "style": "figure",
+      "answer": "To insert a SIM card into an iPhone 5, follow these steps:\n\n1. Use a small paper clip or the SIM eject tool.\n2. Insert the end of the paper clip or SIM eject tool into the hole on the SIM card tray.\n3. Pull out the SIM card tray.\n4. Place the Nano SIM card in the tray as shown.\n5. Align the tray and the SIM card properly, then carefully replace the tray back into the iPhone.\n\nThe tool you need is a small paper clip or the SIM eject tool (which may not be included in all areas) (iPhone User Guide, pages 12-13, 8).",
+      "refused": false,
+      "latency_ms": 2270,
+      "tokens": 1413,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "How do I insert a SIM card into iPhone 5?",
+        "What tool do I need?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1689
+    },
+    {
+      "id": "volume-buttons",
+      "style": "figure",
+      "answer": "The volume buttons on the iPhone are located on the side of the device. They adjust the audio volume when you\u2019re on the phone or listening to media, and otherwise control the volume for the ringer, alerts, and other sound effects (iPhone User Guide, page 9).",
+      "refused": false,
+      "latency_ms": 2213,
+      "tokens": 1359,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "Where are the volume buttons on the iPhone?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1540
+    },
+    {
+      "id": "device-overview",
+      "style": "figure",
+      "answer": "The iPhone 5 overview shows the following buttons and parts:\n\n1. SIM card tray\n2. Receiver/front microphone\n3. Headset jack\n4. Ring/Silent switch\n5. FaceTime camera\n6. Volume buttons\n7. Multi-Touch display\n8. Home button\n9. Bottom microphone\n10. Sleep/Wake button\n11. iSight camera\n12. LED flash\n13. Rear microphone\n14. App icons\n15. Status bar\n16. Speaker\n17. Lightning connector\n\n(iPhone User Guide, page 7)",
+      "refused": false,
+      "latency_ms": 2119,
+      "tokens": 1403,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "What buttons and parts are shown in the iPhone 5 overview?"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1647
+    },
+    {
+      "id": "charge-wall",
+      "style": "figure",
+      "answer": "To charge your iPhone from a wall outlet, follow these steps:\n\n1. Use the included USB cable (Lightning to USB Cable for iPhone 5 or later, or 30-pin to USB Cable for iPhone 4S or earlier).\n2. Connect the USB end of the cable to the Apple USB power adapter.\n3. Plug the power adapter into a power outlet.\n4. Connect the other end of the cable to your iPhone.\n5. Make sure the AC plug or AC power cord is fully inserted into the adapter before plugging it into the power outlet.\n6. Allow adequate ventilation around the power adapter during use, as it may become warm.\n7. Avoid using damaged cables or chargers, and do not charge when moisture is present to prevent electric shock.\n\nNote: In some regions, you may need an iPhone Micro USB Adapter to connect to certain power adapters. Only use power adapters compliant with specified standards or \"Made for iPhone\" cables and adapters compatible with USB 2.0 (iPhone User Guide, pages 8, 34, 147).",
+      "refused": false,
+      "latency_ms": 3642,
+      "tokens": 1388,
+      "groundedness": 1.0,
+      "unsupported": [],
+      "completeness": 1.0,
+      "parts_asked": [
+        "how to charge my iPhone from a wall outlet"
+      ],
+      "missing_parts": [],
+      "cites_expected_page": true,
+      "judge_tokens": 1739
+    }
+  ]
+}
