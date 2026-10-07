@@ -115,7 +115,7 @@ az containerapp logs show -n apple-rag -g rg-apple-rag --follow
 
 ## 5. Phase checklist
 
-- [x] P0 Prep: personal Azure account, $10 budget alert, `.gitignore` (git repo not created yet)
+- [x] P0 Prep: personal Azure account, budget alert, public repo github.com/HarshithHullakereSiddegowda/apple-bot-azure (`data/` is git-ignored: copyrighted manual)
 - [x] P1 Provision: resource group, AI Search Free, `chat` + `embed` deployments, `config.py`
 - [x] P2 Ingest: 418 chunks from 155 pages
 - [x] P3 Retrieve: all 4 modes return results

@@ -307,7 +307,7 @@ Raise the budget alert to **$30** for this roadmap. Check spend weekly: Cost Man
 
 ## Progress tracker
 
-- [ ] L0 Repo + README + smoke test
+- [x] L0 Repo + README + smoke test: github.com/HarshithHullakereSiddegowda/apple-bot-azure (public)
 - [ ] L1 CI/CD + eval gate + blue/green
 - [ ] L2 Key Vault
 - [ ] L3 OpenTelemetry + alerts + uptime test
