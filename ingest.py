@@ -128,7 +128,7 @@ def upload(docs: list[dict], quiet: bool = False, client=None) -> None:
     for i in range(0, len(docs), BATCH_SIZE):
         batch = docs[i:i + BATCH_SIZE]
         vectors = embed([d["content"] for d in batch])
-        for d, vec in zip(batch, vectors):
+        for d, vec in zip(batch, vectors, strict=True):  # fail loudly if a vector is missing
             d["embedding"] = vec
         results = search_client.upload_documents(batch)
         failed = [r.key for r in results if not r.succeeded]

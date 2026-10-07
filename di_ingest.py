@@ -25,7 +25,7 @@ from pathlib import Path
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.documentintelligence.models import AnalyzeOutputOption, AnalyzeResult, DocumentContentFormat
 from azure.core.credentials import AzureKeyCredential
-from azure.search.documents.indexes.models import SimpleField, SearchFieldDataType
+from azure.search.documents.indexes.models import SearchFieldDataType, SimpleField
 
 from config import CHAT_DEPLOYMENT, EMBED_DIMENSIONS, aoai, index_client
 from ingest import DEFAULT_SOURCE, PDF_PATH, build_index

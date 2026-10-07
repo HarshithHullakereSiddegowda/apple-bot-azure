@@ -212,7 +212,7 @@ def upload_document(file: UploadFile = File(...), caller: str = Depends(require_
     try:
         pages = len(PdfReader(io.BytesIO(data)).pages)
     except Exception:
-        raise HTTPException(422, "Could not read the PDF")
+        raise HTTPException(422, "Could not read the PDF") from None
     if pages > MAX_UPLOAD_PAGES:
         raise HTTPException(413, f"Too many pages ({pages}, max {MAX_UPLOAD_PAGES})")
 
@@ -220,7 +220,7 @@ def upload_document(file: UploadFile = File(...), caller: str = Depends(require_
     try:
         result = index_pdf(io.BytesIO(data), source, id_prefix=slugify(name) + "-")
     except ValueError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, str(e)) from e
 
     log.info(json.dumps({"event": "upload", "caller": caller, **result, "bytes": len(data)}))
     return result

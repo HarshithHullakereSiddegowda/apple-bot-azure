@@ -1,0 +1,61 @@
+name: CI
+
+# Runs on every push and pull request. Needs no Azure access and no secrets.
+on:
+  push:
+  pull_request:
+
+# Least privilege: CI can only read the repository.
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now-pointless run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Unit, API and golden-set tests (pytest)
+        run: pytest -q
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image (linux/amd64, not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: apple-rag:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image must not contain secrets or data
+        run: |
+          files=$(docker run --rm apple-rag:ci ls -A /app)
+          echo "$files"
+          if echo "$files" | grep -qE '^\.env$|^data$'; then
+            echo "::error::.env or data/ found inside the image"; exit 1
+          fi

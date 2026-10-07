@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [".venv", "data"]
+
+[tool.ruff.lint]
+# E/W: style errors · F: real bugs (undefined names, unused imports) · I: import order · B: common bug patterns
+select = ["E", "W", "F", "I", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI declares parameters with these calls as defaults by design.
+extend-immutable-calls = ["fastapi.File", "fastapi.Depends", "fastapi.Header"]
+
+[tool.ruff.lint.per-file-ignores]
+"evals/run_evals.py" = ["E402"]   # path setup must run before project imports
+"tests/*" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
