@@ -1,0 +1,115 @@
+# STATUS: written and reviewed, NOT yet run. Remaining setup: service connection 'azure-apple-rag'
+# (manual workload identity federation; Azure app 'apple-rag-azdo-deployer', client id
+# cadf9613-1737-4186-945f-bdc9be16dedf, already has Contributor on rg-apple-rag; add its federated credential
+# from the Issuer/Subject shown in Azure DevOps), a self-hosted agent in pool 'Default', GHCR_USER/GHCR_TOKEN variables,
+# and an approval check on the 'production' Environment. Org: dev.azure.com/harshith004, project apple-bot-azure.
+#
+# Azure DevOps version of .github/workflows/ci.yml + deploy.yml.
+# Same zero-downtime flow; adds an approval gate via the "production" Environment.
+#
+#   Stage CI      : ruff -> pytest -> docker build check
+#   Stage Build   : build linux/amd64 image, push to ghcr.io (tag = commit SHA)
+#   Stage Deploy  : [approval] -> new revision at 0% -> smoke test it -> shift 100% -> smoke public URL -> rollback on failure
+#
+# Runs on a self-hosted macOS agent (pool "Default"). Needs on the agent: python3.12, docker (buildx), az CLI.
+# Pipeline variables to define (Pipelines > Edit > Variables): GHCR_USER, GHCR_TOKEN (secret; PAT with write:packages)
+
+trigger:
+  branches:
+    include: [main]
+
+pr: none   # pull requests are covered by GitHub Actions CI
+
+pool:
+  name: Default   # self-hosted agent (your Mac)
+
+variables:
+  IMAGE: ghcr.io/harshithhullakeresiddegowda/apple-rag
+  APP: apple-rag
+  RG: rg-apple-rag
+  PUBLIC_URL: https://apple-rag.agreeablestone-6fb7e6d2.australiaeast.azurecontainerapps.io
+  SERVICE_CONNECTION: azure-apple-rag
+  SHORT_SHA: $[ substring(variables['Build.SourceVersion'], 0, 7) ]
+
+stages:
+  - stage: CI
+    displayName: Lint and test
+    jobs:
+      - job: test
+        steps:
+          - checkout: self
+          - script: |
+              python3.12 -m venv .ci-venv
+              . .ci-venv/bin/activate
+              pip install -q -r requirements.txt -r requirements-dev.txt
+              ruff check .
+              pytest -q
+            displayName: ruff + pytest
+
+  - stage: Build
+    displayName: Build and push image
+    dependsOn: CI
+    jobs:
+      - job: image
+        steps:
+          - checkout: self
+          - script: |
+              echo "$(GHCR_TOKEN)" | docker login ghcr.io -u "$(GHCR_USER)" --password-stdin
+              docker buildx build --platform linux/amd64 -t "$(IMAGE):$(Build.SourceVersion)" --push .
+              docker logout ghcr.io
+            displayName: docker buildx (linux/amd64) + push
+
+  - stage: Deploy
+    displayName: Deploy to production
+    dependsOn: Build
+    jobs:
+      - deployment: release
+        environment: production          # approval gate is configured on this Environment
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: New revision at 0% -> smoke -> shift traffic -> smoke (rollback on failure)
+                  inputs:
+                    azureSubscription: $(SERVICE_CONNECTION)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      az extension add --name containerapp --upgrade --only-show-errors
+
+                      live=$(az containerapp ingress traffic show -n "$(APP)" -g "$(RG)" \
+                               --query "[?weight > \`0\`].revisionName | [0]" -o tsv)
+                      echo "Live revision (rollback target): $live"
+
+                      suffix="ado-$(SHORT_SHA)-$(Build.BuildId)"
+                      rev="$(APP)--$suffix"
+                      az containerapp update -n "$(APP)" -g "$(RG)" \
+                        --image "$(IMAGE):$(Build.SourceVersion)" --revision-suffix "$suffix" --only-show-errors -o none
+                      fqdn=$(az containerapp revision show -n "$(APP)" -g "$(RG)" --revision "$rev" --query properties.fqdn -o tsv)
+
+                      if ! scripts/smoke.sh "https://$fqdn"; then
+                        echo "##vso[task.logissue type=error]New revision failed its smoke test; users never saw it."
+                        az containerapp revision deactivate -n "$(APP)" -g "$(RG)" --revision "$rev" --only-show-errors || true
+                        exit 1
+                      fi
+
+                      az containerapp ingress traffic set -n "$(APP)" -g "$(RG)" --revision-weight "$rev=100" --only-show-errors -o none
+                      echo "Traffic: $rev = 100%"
+
+                      if ! scripts/smoke.sh "$(PUBLIC_URL)"; then
+                        az containerapp ingress traffic set -n "$(APP)" -g "$(RG)" --revision-weight "$live=100" --only-show-errors -o none
+                        echo "##vso[task.logissue type=error]Public smoke test failed; rolled back to $live."
+                        exit 1
+                      fi
+
+                      for r in $(az containerapp revision list -n "$(APP)" -g "$(RG)" --query "[?properties.active].name" -o tsv); do
+                        if [ "$r" != "$rev" ] && [ "$r" != "$live" ]; then
+                          az containerapp revision deactivate -n "$(APP)" -g "$(RG)" --revision "$r" --only-show-errors -o none
+                          echo "deactivated $r"
+                        fi
+                      done
+                      echo "Deployed $rev. Rollback: az containerapp ingress traffic set -n $(APP) -g $(RG) --revision-weight $live=100"

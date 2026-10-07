@@ -308,7 +308,7 @@ Raise the budget alert to **$30** for this roadmap. Check spend weekly: Cost Man
 ## Progress tracker
 
 - [x] L0 Repo + README + smoke test: github.com/HarshithHullakereSiddegowda/apple-bot-azure (public)
-- [ ] L1 CI/CD + eval gate + blue/green
+- [x] L1 CI/CD (GitHub Actions): ruff + 26 tests + image build; OIDC deploy, 0% revision, private smoke test, traffic shift, auto-rollback. Azure DevOps `azure-pipelines.yml` written, not yet run. Weekly live evals still to add.
 - [ ] L2 Key Vault
 - [ ] L3 OpenTelemetry + alerts + uptime test
 - [ ] L4 Foundry agent + tools + agent evals

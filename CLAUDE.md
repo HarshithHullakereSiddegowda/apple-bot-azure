@@ -89,6 +89,15 @@ A/B on 34 questions (`evals/report_pypdf.md` vs `evals/report_di.md`): hit@5 equ
 `chat` deployment raised to 100K TPM / 100 RPM: at 20K it allowed only 20 requests per minute, and vision batch jobs
 hit 429.
 
+**Deploy pipeline (Layer 1):** every push to `main` runs `.github/workflows/deploy.yml`: CI gate → image
+`ghcr.io/harshithhullakeresiddegowda/apple-rag:<git-sha>` → revision `apple-rag--sha-<7>` at 0% → `scripts/smoke.sh` on the
+revision URL → 100% traffic → smoke public URL → auto-rollback. The app is in **multiple-revision mode**; the previous
+revision stays active at 0% for rollback. Azure login is OIDC: app `apple-rag-github-deployer` (52057a8b-…), Contributor on
+`rg-apple-rag` + OpenAI User + Search Index Data Reader. Its federated subjects use GitHub's ID format
+`repo:HarshithHullakereSiddegowda@100402681/apple-bot-azure@1408202525:environment:{production|evals}`; the plain
+`repo:owner/name` form fails with AADSTS700213. Don't deploy by hand with `az containerapp update` any more: push to `main`
+(or run the workflow manually) so every revision is traceable to a commit.
+
 Local dev port: **8010** (`uvicorn app:app --port 8010`). Port 8000 is used by the original bot's Docker stack.
 `/upload` requires header `X-API-Key: <APP_API_KEY>`; everything else is public.
 
