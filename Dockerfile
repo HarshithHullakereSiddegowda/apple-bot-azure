@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Links the GHCR package to the GitHub repo.
+LABEL org.opencontainers.image.source="https://github.com/HarshithHullakereSiddegowda/apple-bot-azure"
+
 # Flush logs immediately so every JSON log line reaches Azure Log Analytics.
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
