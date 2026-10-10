@@ -16,3 +16,6 @@ __pycache__/
 .ruff_cache/
 .DS_Store
 *.log
+
+# company profiles: local only (not committed)
+tender/data/horsell_profile.md

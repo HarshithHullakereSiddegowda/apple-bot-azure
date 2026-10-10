@@ -14,6 +14,7 @@ extend-immutable-calls = ["fastapi.File", "fastapi.Depends", "fastapi.Header"]
 [tool.ruff.lint.per-file-ignores]
 "evals/run_evals.py" = ["E402"]   # path setup must run before project imports
 "tests/*" = ["E402"]
+"tender/make_tender_pdfs.py" = ["E501"]   # long sentences in fictional tender text
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

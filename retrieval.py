@@ -20,10 +20,11 @@ K_NEAREST = 50  # vector candidates handed to the merge / reranker
 
 
 def retrieve(question: str, mode: str = "hybrid_rerank", k: int = 5,
-             source: str | None = None) -> list[dict]:
+             source: str | None = None, client=None) -> list[dict]:
     """Return the top-k chunks as dicts: id, source, page, content, score.
 
     source: limit the search to one document (exact name); None searches every document.
+    client: a SearchClient for another index (e.g. tender-docs); default is the app's index.
     """
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}")
@@ -45,7 +46,7 @@ def retrieve(question: str, mode: str = "hybrid_rerank", k: int = 5,
         options["query_type"] = "semantic"                     # reranker on top
         options["semantic_configuration_name"] = "sem"
 
-    results = search_client.search(top=k, select=["id", "source", "page", "content"], **options)
+    results = (client or search_client).search(top=k, select=["id", "source", "page", "content"], **options)
     return [
         {
             "id": r["id"],

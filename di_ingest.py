@@ -47,9 +47,13 @@ FIGURE_PROMPT = (
 
 # ── 1. Analyze (cached) ───────────────────────────────────────────────────────
 
-def analyze(pdf_path: str, pages: str | None) -> tuple[AnalyzeResult, dict[str, bytes]]:
-    """Run prebuilt-layout once and download every figure in the same run (figures expire after 24 h)."""
-    tag = (pages or "all").replace(",", "_")
+def analyze(pdf: str | bytes, pages: str | None, tag: str | None = None) -> tuple[AnalyzeResult, dict[str, bytes]]:
+    """Run prebuilt-layout once and download every figure in the same run (figures expire after 24 h).
+
+    pdf: a file path or the PDF's bytes (e.g. downloaded from Blob).
+    tag: cache name; defaults to the page range, so each document needs its own tag to avoid sharing a cache.
+    """
+    tag = tag or (pages or "all").replace(",", "_")
     result_file, fig_dir = CACHE / f"layout_{tag}.json", CACHE / f"figures_{tag}"
     if result_file.exists():
         print(f"Using cached analysis {result_file}")
@@ -57,13 +61,13 @@ def analyze(pdf_path: str, pages: str | None) -> tuple[AnalyzeResult, dict[str, 
         return AnalyzeResult(json.loads(result_file.read_text())), figures
 
     client = DocumentIntelligenceClient(os.environ["DI_ENDPOINT"], AzureKeyCredential(os.environ["DI_KEY"]))
-    print(f"Analyzing {pdf_path} (pages: {pages or 'all'}) with prebuilt-layout...")
-    with open(pdf_path, "rb") as f:
-        poller = client.begin_analyze_document(
-            "prebuilt-layout", body=f, pages=pages,
-            output_content_format=DocumentContentFormat.MARKDOWN,
-            output=[AnalyzeOutputOption.FIGURES],
-        )
+    print(f"Analyzing {tag} (pages: {pages or 'all'}) with prebuilt-layout...")
+    body = pdf if isinstance(pdf, bytes) else Path(pdf).read_bytes()
+    poller = client.begin_analyze_document(
+        "prebuilt-layout", body=body, pages=pages,
+        output_content_format=DocumentContentFormat.MARKDOWN,
+        output=[AnalyzeOutputOption.FIGURES],
+    )
     result = poller.result()
     result_id = poller.details["operation_id"]
 
