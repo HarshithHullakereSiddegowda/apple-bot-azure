@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tender Copilot</title>
+<style>
+  :root { --bg:#f6f6f4; --card:#fff; --ink:#1c1c1e; --muted:#6b6b70; --line:#e2e2e0; --accent:#0a66d8;
+          --accent-ink:#fff; --chip:#eef3fb; --ok:#1a7f37; --warn:#9a6700; --err:#b42318; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151517; --card:#1f1f22; --ink:#f2f2f4; --muted:#9a9aa2; --line:#2e2e33; --accent:#4c9bff;
+            --accent-ink:#0b0b0c; --chip:#1d2a3d; --ok:#56d364; --warn:#e3b341; --err:#ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:1200px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:15px; margin:0 0 10px; }
+  .sub { color:var(--muted); margin:0 0 16px; }
+  .grid { display:grid; grid-template-columns: minmax(0,5fr) minmax(0,7fr); gap:16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .card + .card { margin-top:16px; }
+  input, textarea, select { width:100%; font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:9px 11px; }
+  textarea { min-height:64px; resize:vertical; }
+  button { font:inherit; font-weight:600; border:0; border-radius:8px; padding:9px 16px; background:var(--accent); color:var(--accent-ink); cursor:pointer; }
+  button.secondary { background:var(--chip); color:var(--ink); font-weight:400; }
+  button.reject { background:var(--err); color:#fff; }
+  button:disabled { opacity:.5; cursor:wait; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:6px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr.row:hover { background:var(--chip); cursor:pointer; }
+  .tablewrap { overflow-x:auto; max-height:520px; overflow-y:auto; }
+  .chip { display:inline-block; border-radius:999px; padding:1px 8px; font-size:12px; background:var(--chip); }
+  .v-strong,.v-moderate { color:var(--ok); } .v-confirm_before_bidding { color:var(--warn); } .v-poor { color:var(--muted); }
+  #thread { display:flex; flex-direction:column; gap:10px; margin-top:12px; max-height:520px; overflow-y:auto; }
+  .msg { white-space:pre-wrap; border-radius:10px; padding:10px 12px; }
+  .msg.you { background:var(--chip); align-self:flex-end; max-width:85%; }
+  .msg.agent { border:1px solid var(--line); }
+  .tools { font-size:12px; color:var(--muted); margin-top:6px; }
+  .decision { border:2px solid var(--warn); }
+  .row2 { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px; }
+  .row2 > * { flex: 1 1 160px; }
+  .status { font-size:13px; color:var(--muted); min-height:1.4em; margin-top:6px; }
+  .err { color:var(--err); } .ok { color:var(--ok); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tender Copilot</h1>
+  <p class="sub">Bid Analyst agent (Azure AI Foundry). The agent recommends; a person decides.</p>
+
+  <div class="card">
+    <label for="key">API key (kept only in this browser tab)</label>
+    <input id="key" type="password" autocomplete="off" placeholder="X-API-Key">
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div>
+      <div class="card">
+        <h2>Tender tray <button class="secondary" id="refresh" style="float:right;padding:3px 10px">Refresh</button></h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>ID</th><th>Title</th><th>Closes</th><th>Status</th><th>Verdict</th></tr></thead>
+          <tbody id="tenders"><tr><td colspan="5">Enter the API key to load tenders.</td></tr></tbody>
+        </table></div>
+      </div>
+      <div id="decisions"></div>
+    </div>
+
+    <div class="card">
+      <h2>Ask the Bid Analyst</h2>
+      <textarea id="msg" placeholder="e.g. Should Horsell bid on T-009? What would stop us?"></textarea>
+      <div class="row2"><button id="send">Send</button><button class="secondary" id="newchat">New conversation</button></div>
+      <div id="chatstatus" class="status"></div>
+      <div id="thread"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const STORE = "tender-key";
+  let threadId = null;
+
+  try { $("key").value = sessionStorage.getItem(STORE) || ""; } catch (_) {}
+  $("key").addEventListener("change", () => { try { sessionStorage.setItem(STORE, $("key").value.trim()); } catch (_) {} loadTenders(); });
+  $("refresh").addEventListener("click", loadTenders);
+  $("send").addEventListener("click", send);
+  $("newchat").addEventListener("click", () => { threadId = null; $("thread").replaceChildren(); $("chatstatus").textContent = "New conversation."; });
+  $("msg").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
+  const api = async (path, opts = {}) => {
+    const res = await fetch(path, { ...opts, headers: { "Content-Type": "application/json", "X-API-Key": $("key").value.trim(), ...(opts.headers || {}) } });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(res.status === 401 ? "Invalid or missing API key." : (data.detail || `Error ${res.status}`));
+    return data;
+  };
+
+  async function loadTenders() {
+    if (!$("key").value.trim()) return;
+    try {
+      const data = await api("/tender/tenders");
+      const body = $("tenders"); body.replaceChildren();
+      data.tenders.forEach((t) => {
+        const tr = el("tr", "row");
+        tr.append(el("td", "", t.tender_id), el("td", "", t.title), el("td", "", t.closes || ""),
+                  el("td", "", t.status || ""), el("td", t.verdict ? "v-" + t.verdict : "", t.verdict ? `${t.verdict} (${t.score})` : "–"));
+        tr.addEventListener("click", () => { $("msg").value = `Should Horsell bid on ${t.tender_id}? What would stop us?`; $("msg").focus(); });
+        body.append(tr);
+        if (t.status === "awaiting_decision") showDecisionFor(t.tender_id);
+      });
+    } catch (e) { $("tenders").replaceChildren(el("tr", "", "")); $("tenders").firstChild.append(el("td", "err", e.message)); }
+  }
+
+  async function send() {
+    const message = $("msg").value.trim(); if (message.length < 2) return;
+    $("thread").prepend(el("div", "msg you", message));
+    $("msg").value = ""; $("send").disabled = true; $("chatstatus").textContent = "Agent is working (choosing and running tools)…";
+    try {
+      const r = await api("/tender/agent", { method: "POST", body: JSON.stringify({ message, thread_id: threadId }) });
+      threadId = r.thread_id;
+      const m = el("div", "msg agent", r.answer);
+      if (r.tool_calls.length) m.append(el("div", "tools", "Tools used: " + r.tool_calls.map((t) => `${t.tool}(${t.arguments})`).join(" → ")));
+      $("thread").prepend(m);
+      $("chatstatus").textContent = `${r.seconds}s · ${r.tool_calls.length} tool call(s)`;
+      r.pending_decisions.forEach(renderDecision);
+      loadTenders();
+    } catch (e) { $("chatstatus").className = "status err"; $("chatstatus").textContent = e.message; }
+    finally { $("send").disabled = false; }
+  }
+
+  async function showDecisionFor(tid) {
+    if (document.getElementById("dec-" + tid)) return;
+    try { const t = await api(`/tender/tenders/${encodeURIComponent(tid)}`); if (t.pending_decision) renderDecision(t.pending_decision); } catch (_) {}
+  }
+
+  function renderDecision(d) {
+    const id = "dec-" + d.tender_id; document.getElementById(id)?.remove();
+    const card = el("div", "card decision"); card.id = id;
+    const s = d.score_snapshot || {};
+    card.append(el("h2", "", `Decision needed: ${d.tender_id}`),
+      el("div", "", `AI recommends: ${d.recommendation.toUpperCase()} · verdict ${s.verdict} (${s.score}) · ${s.service_line_matched || "no service line"}`),
+      el("div", "tools", d.reasoning));
+    if ((s.mandatory_blockers || []).length) {
+      const ul = el("ul"); s.mandatory_blockers.forEach((b) => ul.append(el("li", "", b))); card.append(el("div", "", "Blockers to confirm:"), ul);
+    }
+    const who = el("input"); who.placeholder = "Your name (decided by)";
+    const note = el("textarea"); note.placeholder = "Reason (kept in the audit trail)";
+    const status = el("div", "status");
+    const approve = el("button", "", "Approve: BID"); const reject = el("button", "reject", "Reject: NO BID");
+    const decide = async (decision) => {
+      approve.disabled = reject.disabled = true;
+      try {
+        const r = await api(`/tender/tenders/${encodeURIComponent(d.tender_id)}/decision`,
+                            { method: "POST", body: JSON.stringify({ decision, decided_by: who.value.trim(), note: note.value.trim() }) });
+        status.className = "status ok"; status.textContent = `Recorded: ${r.decision} by ${r.decided_by} at ${r.decided_at} (agreed with AI: ${r.agreed_with_ai}).`;
+        loadTenders();
+      } catch (e) { status.className = "status err"; status.textContent = e.message; approve.disabled = reject.disabled = false; }
+    };
+    approve.addEventListener("click", () => decide("bid")); reject.addEventListener("click", () => decide("no_bid"));
+    const row = el("div", "row2"); row.append(approve, reject);
+    card.append(who, el("div", "", ""), note, row, status);
+    $("decisions").prepend(card);
+  }
+
+  loadTenders();
+</script>
+</body>
+</html>

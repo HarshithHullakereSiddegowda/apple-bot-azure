@@ -14,6 +14,7 @@ os.environ.update({
     "SEARCH_KEY": "unit-test-key",
     "INDEX_NAME": "unit-test-index",
     "APP_API_KEY": "unit-test-app-key",
+    "TENDER_ENABLED": "false",   # public default; tender routes must not exist
 })
 
 ROOT = Path(__file__).resolve().parents[1]

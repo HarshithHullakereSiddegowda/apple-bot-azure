@@ -130,3 +130,42 @@ def test_uncited_answer_is_flagged_but_not_found_is_fine():
     from tender.tools import NOT_FOUND, check_citations
     assert any("no citation" in w for w in check_citations("ISO 9001 is required.", {1}))
     assert check_citations(NOT_FOUND, {1}) == []
+
+
+# ── Brick 6: human-only bid decision lock ─────────────────────────────────────
+
+def test_agent_cannot_approve_or_reject():
+    from tender.store import check_transition
+    for target in ("approved_to_bid", "no_bid"):
+        for signer in ("agent2", "agent2.request_bid_decision", "human:", "system"):
+            with pytest.raises(PermissionError):
+                check_transition("awaiting_decision", target, by=signer)
+
+
+def test_human_can_decide_and_agent_can_request():
+    from tender.store import check_transition
+    check_transition("scored", "awaiting_decision", by="agent2.request_bid_decision")
+    check_transition("awaiting_decision", "approved_to_bid", by="human:bid-manager")
+    check_transition("awaiting_decision", "no_bid", by="human:bid-manager")
+
+
+def test_no_skipping_the_decision():
+    from tender.store import check_transition
+    with pytest.raises(ValueError):
+        check_transition("new", "approved_to_bid", by="human:bid-manager")   # must be scored first
+    with pytest.raises(ValueError):
+        check_transition("awaiting_decision", "drafted", by="human:bid-manager")
+
+
+def test_record_decision_rejects_agent_or_missing_reason():
+    from tender.tools import record_bid_decision
+    with pytest.raises(PermissionError):
+        record_bid_decision("T-009", "bid", decided_by="Agent2", note="x")
+    with pytest.raises(ValueError):
+        record_bid_decision("T-009", "bid", decided_by="bid-manager", note="   ")
+
+
+def test_record_decision_is_not_an_agent_tool():
+    from tender.agent import DISPATCH, TOOLS
+    assert "record_bid_decision" not in DISPATCH
+    assert "record_bid_decision" not in {t.function.name for t in TOOLS}

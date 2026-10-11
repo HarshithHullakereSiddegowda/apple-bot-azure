@@ -36,3 +36,8 @@ def test_upload_rejects_non_pdf_even_with_key():
 def test_ask_validates_input_before_any_model_call():
     assert client.post("/ask", json={"question": "a"}).status_code == 422          # too short
     assert client.post("/ask", json={"question": "hello", "k": 50}).status_code == 422  # k > 10
+
+
+def test_tender_routes_do_not_exist_when_disabled():
+    assert client.get("/tender/tenders", headers={"X-API-Key": "unit-test-app-key"}).status_code == 404
+    assert client.get("/tender-ui").status_code == 404

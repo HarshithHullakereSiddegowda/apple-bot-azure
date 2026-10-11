@@ -26,13 +26,26 @@ CONTAINER = "tenders"
 # Allowed status flow. Agents may only move a tender forward along these edges.
 TRANSITIONS = {
     "new": {"scored"},
-    "scored": {"scored", "approved_to_bid", "no_bid"},   # re-scoring allowed (e.g. after an addendum)
+    "scored": {"scored", "awaiting_decision", "approved_to_bid", "no_bid"},   # re-scoring allowed
+    "awaiting_decision": {"awaiting_decision", "scored", "approved_to_bid", "no_bid"},
     "approved_to_bid": {"drafted"},
     "drafted": {"drafted", "sent_to_sharepoint"},
     "sent_to_sharepoint": {"formatted"},
     "no_bid": set(),
     "formatted": set(),
 }
+
+# Bid / no-bid is a human decision. Only a caller signed "human:<who>" may move a tender into these states.
+HUMAN_ONLY = {"approved_to_bid", "no_bid"}
+
+
+def check_transition(current: str | None, new: str, by: str) -> None:
+    """Pure rule check (no storage): raises ValueError if the move is not allowed or not properly signed."""
+    allowed = TRANSITIONS.get(current, set()) if current else {"new"}
+    if new not in allowed:
+        raise ValueError(f"cannot move from {current!r} to {new!r} (allowed: {sorted(allowed)})")
+    if new in HUMAN_ONLY and not (by.startswith("human:") and len(by) > len("human:")):
+        raise PermissionError(f"{new!r} is a human decision; signature {by!r} is not a person")
 
 
 @lru_cache(maxsize=1)
@@ -86,9 +99,10 @@ def get_status(tender_id: str) -> str | None:
 
 def set_status(tender_id: str, new: str, by: str, note: str = "") -> None:
     current = get_json(tender_id, "status.json") or {"status": None, "history": []}
-    allowed = TRANSITIONS.get(current["status"], set()) if current["status"] else {"new"}
-    if new not in allowed:
-        raise ValueError(f"{tender_id}: cannot move from {current['status']!r} to {new!r} (allowed: {sorted(allowed)})")
+    try:
+        check_transition(current["status"], new, by)
+    except (ValueError, PermissionError) as e:
+        raise type(e)(f"{tender_id}: {e}") from None
     current["history"].append({"from": current["status"], "to": new, "by": by, "note": note,
                                "at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
     current["status"] = new

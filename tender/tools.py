@@ -447,3 +447,73 @@ def ask_tender(tender_id: str, question: str) -> dict:
                           | {"at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
     store.put_json(tender_id, "qa_log.json", log)
     return result
+
+
+# ── Tool 0: list_tenders ──────────────────────────────────────────────────────
+
+def list_tenders(status: str | None = None) -> dict:
+    """Tenders in the handoff tray with status and score (read-only, no LLM). Optional status filter."""
+    out = []
+    for tid in store.list_tenders():
+        st = store.get_status(tid)
+        if status and st != status:
+            continue
+        notice = store.get_json(tid, "notice.json") or {}
+        score = store.get_json(tid, "score.json")
+        out.append({"tender_id": tid, "title": notice.get("title", "")[:90], "closes": notice.get("closes"),
+                    "status": st, "verdict": score["verdict"] if score else None,
+                    "score": score["score"] if score else None})
+    return {"count": len(out), "tenders": out}
+
+
+# ── Tool 5a: request_bid_decision (agent) + record_bid_decision (human only) ──
+
+def request_bid_decision(tender_id: str, recommendation: Literal["bid", "no_bid"], reasoning: str) -> dict:
+    """AGENT tool: save a recommendation and hand the decision to the bid manager. Never decides."""
+    status = store.get_status(tender_id)
+    if status is None:
+        return {"error": f"Unknown tender {tender_id!r}"}
+    if status in ("approved_to_bid", "no_bid", "drafted", "sent_to_sharepoint", "formatted"):
+        return {"status": status, "message": "A person has already recorded the decision for this tender.",
+                "decision": store.get_json(tender_id, "decision.json")}
+    score = store.get_json(tender_id, "score.json")
+    if score is None:
+        return {"error": "Score the tender first (score_fit) so the recommendation is based on evidence."}
+    if recommendation not in ("bid", "no_bid"):
+        return {"error": "recommendation must be 'bid' or 'no_bid'"}
+    request = {"tender_id": tender_id, "recommendation": recommendation, "reasoning": reasoning,
+               "score_snapshot": {k: score.get(k) for k in ("verdict", "score", "service_line_matched",
+                                                            "mandatory_blockers", "prompt_version")},
+               "requested_by": "agent2", "requested_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    store.put_json(tender_id, "decision_request.json", request)
+    store.set_status(tender_id, "awaiting_decision", by="agent2.request_bid_decision",
+                     note=f"AI recommends {recommendation}")
+    return {"status": "awaiting_decision", "recommendation": recommendation,
+            "message": "Recommendation saved. The bid manager must record the bid / no-bid decision."}
+
+
+def record_bid_decision(tender_id: str, decision: Literal["bid", "no_bid"], decided_by: str, note: str) -> dict:
+    """HUMAN ONLY: not exposed to the agent. Called from the app (API, approval card, Power Automate)."""
+    if decision not in ("bid", "no_bid"):
+        raise ValueError("decision must be 'bid' or 'no_bid'")
+    who = decided_by.strip()
+    if not who or "agent" in who.lower():
+        raise PermissionError("decided_by must name the person making the decision")
+    if not note.strip():
+        raise ValueError("a short reason (note) is required for the audit trail")
+    request = store.get_json(tender_id, "decision_request.json") or {}
+    record = {"tender_id": tender_id, "decision": decision, "decided_by": who, "note": note.strip(),
+              "ai_recommendation": request.get("recommendation"),
+              "agreed_with_ai": (request.get("recommendation") == decision) if request else None,
+              "decided_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    store.set_status(tender_id, "approved_to_bid" if decision == "bid" else "no_bid",
+                     by=f"human:{who}", note=note.strip())
+    store.put_json(tender_id, "decision.json", record)
+    return record
+
+
+def require_approved(tender_id: str) -> None:
+    """Guard for drafting tools: raises unless a person has approved the bid."""
+    status = store.get_status(tender_id)
+    if status not in ("approved_to_bid", "drafted"):
+        raise PermissionError(f"{tender_id} is {status!r}; drafting needs a human 'bid' decision first")

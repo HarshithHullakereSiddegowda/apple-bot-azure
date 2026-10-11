@@ -224,3 +224,16 @@ def upload_document(file: UploadFile = File(...), caller: str = Depends(require_
 
     log.info(json.dumps({"event": "upload", "caller": caller, **result, "bytes": len(data)}))
     return result
+
+
+# ── Tender Copilot (optional feature) ─────────────────────────────────────────
+# Off unless TENDER_ENABLED=true: the public deployment has no tender data or company profile, so the routes must
+# not exist there. Every tender route requires the API key.
+if os.environ.get("TENDER_ENABLED", "").lower() == "true":
+    from tender.api import router as tender_router
+
+    app.include_router(tender_router, dependencies=[Depends(require_api_key)])
+
+    @app.get("/tender-ui", include_in_schema=False)
+    def tender_ui() -> FileResponse:
+        return FileResponse(STATIC / "tender.html")
