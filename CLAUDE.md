@@ -98,6 +98,15 @@ revision stays active at 0% for rollback. Azure login is OIDC: app `apple-rag-gi
 `repo:owner/name` form fails with AADSTS700213. Don't deploy by hand with `az containerapp update` any more: push to `main`
 (or run the workflow manually) so every revision is traceable to a commit.
 
+**Tender Copilot in Azure (live since 2026-10-12, revision `apple-rag--tender-on-1`):** `/tender-ui` and `/tender/*`
+behind the API key (no Microsoft login, by choice: the API key holder can see tender data and records decisions with a
+typed name). Settings on the Container App: `TENDER_ENABLED=true`, `TENDER_STORAGE_ACCOUNT=harshithtenderstore`,
+`TENDER_PROFILE_BLOB=config/horsell_profile.md` (private container; the profile is never in the image or git),
+`FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_MODEL=agent-brain`, `DI_ENDPOINT`. App identity roles added: Storage Blob
+Data Contributor (tender storage), Foundry User (Foundry), Cognitive Services User (Document Intelligence). Keyless
+everywhere: `di_client()` uses DI_KEY locally, managed identity in Azure. The pipeline's `update --image` keeps these
+settings. `.dockerignore` must use `**/data/` and no end-of-line comments; CI scans the image for private files.
+
 Local dev port: **8010** (`uvicorn app:app --port 8010`). Port 8000 is used by the original bot's Docker stack.
 `/upload` requires header `X-API-Key: <APP_API_KEY>`; everything else is public.
 
