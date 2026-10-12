@@ -14,7 +14,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Only the runtime code. No .env, no data, no evals (see .dockerignore).
-COPY config.py retrieval.py ingest.py ratelimit.py app.py ./
+COPY config.py retrieval.py ingest.py di_ingest.py ratelimit.py app.py ./
+COPY tender/ ./tender/
 COPY static/ ./static/
 
 # Don't run as root inside the container.

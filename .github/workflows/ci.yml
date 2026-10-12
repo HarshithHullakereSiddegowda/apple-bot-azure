@@ -56,8 +56,9 @@ jobs:
 
       - name: Image must not contain secrets or data
         run: |
-          files=$(docker run --rm apple-rag:ci ls -A /app)
-          echo "$files"
-          if echo "$files" | grep -qE '^\.env$|^data$'; then
-            echo "::error::.env or data/ found inside the image"; exit 1
+          docker run --rm apple-rag:ci ls -A /app /app/tender
+          leaks=$(docker run --rm apple-rag:ci find /app -name ".env*" -o -type d -name data \
+                    -o -name "*profile*.md" -o -name "*notices*.json" -o -name "*label*")
+          if [ -n "$leaks" ]; then
+            echo "::error::private files found inside the image:"; echo "$leaks"; exit 1
           fi

@@ -3,6 +3,7 @@
 The Foundry agent decides WHICH tool to call; these functions decide WHAT the tool is allowed to do.
 """
 import os
+from functools import lru_cache
 from pathlib import Path
 
 from tender import store
@@ -10,8 +11,22 @@ from tender import store
 PROFILE_PATH = Path(os.environ.get("TENDER_PROFILE", Path(__file__).parent / "data" / "horsell_profile.md"))
 
 
+@lru_cache(maxsize=1)
+def _profile_from_blob(ref: str) -> str:
+    """ref = "<container>/<blob>", e.g. "config/horsell_profile.md". Cached per process (restart to pick up edits)."""
+    container, _, blob = ref.partition("/")
+    return store.container_for(container).download_blob(blob).readall().decode("utf-8")
+
+
 def load_profile() -> str:
-    """Company capability profile (local file, not committed). Falls back to the fictional demo profile."""
+    """Company capability profile.
+
+    Cloud: TENDER_PROFILE_BLOB is set → read from the private Blob container; any failure raises (never silently
+    score against the wrong company). Local: the git-ignored file, else the fictional demo profile.
+    """
+    ref = os.environ.get("TENDER_PROFILE_BLOB")
+    if ref:
+        return _profile_from_blob(ref)
     path = PROFILE_PATH if PROFILE_PATH.exists() else Path(__file__).parent / "data" / "company_profile.md"
     return path.read_text()
 

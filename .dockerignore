@@ -5,11 +5,19 @@
 # Not needed at runtime
 .venv/
 data/
+# ANY data folder at any depth (tender/data holds the profile, real notices, labels).
+# .dockerignore has no end-of-line comments: a trailing '# ...' becomes part of the pattern.
+**/data/
 evals/
-__pycache__/
+**/__pycache__/
 *.pyc
 .git/
 .gitignore
 CLAUDE.md
 Dockerfile
 .dockerignore
+
+# Tender dev-only scripts and evals
+tender/eval_*.py
+tender/make_tender_pdfs.py
+tender/decide.py

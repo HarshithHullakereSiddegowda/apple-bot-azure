@@ -25,6 +25,7 @@ from pathlib import Path
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.documentintelligence.models import AnalyzeOutputOption, AnalyzeResult, DocumentContentFormat
 from azure.core.credentials import AzureKeyCredential
+from azure.identity import DefaultAzureCredential
 from azure.search.documents.indexes.models import SearchFieldDataType, SimpleField
 
 from config import CHAT_DEPLOYMENT, EMBED_DIMENSIONS, aoai, index_client
@@ -47,6 +48,13 @@ FIGURE_PROMPT = (
 
 # ── 1. Analyze (cached) ───────────────────────────────────────────────────────
 
+def di_client() -> DocumentIntelligenceClient:
+    """Key locally (DI_KEY in .env); managed identity in Azure (no DI_KEY): role 'Cognitive Services User'."""
+    key = os.environ.get("DI_KEY")
+    credential = AzureKeyCredential(key) if key else DefaultAzureCredential()
+    return DocumentIntelligenceClient(os.environ["DI_ENDPOINT"], credential)
+
+
 def analyze(pdf: str | bytes, pages: str | None, tag: str | None = None) -> tuple[AnalyzeResult, dict[str, bytes]]:
     """Run prebuilt-layout once and download every figure in the same run (figures expire after 24 h).
 
@@ -60,7 +68,7 @@ def analyze(pdf: str | bytes, pages: str | None, tag: str | None = None) -> tupl
         figures = {p.stem: p.read_bytes() for p in fig_dir.glob("*.png")}
         return AnalyzeResult(json.loads(result_file.read_text())), figures
 
-    client = DocumentIntelligenceClient(os.environ["DI_ENDPOINT"], AzureKeyCredential(os.environ["DI_KEY"]))
+    client = di_client()
     print(f"Analyzing {tag} (pages: {pages or 'all'}) with prebuilt-layout...")
     body = pdf if isinstance(pdf, bytes) else Path(pdf).read_bytes()
     poller = client.begin_analyze_document(
