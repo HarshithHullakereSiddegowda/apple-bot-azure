@@ -32,7 +32,7 @@ container: tenders
 tenders/{tender_id}/
 ├── notice.json        title, agency, closes, category, description
 ├── source/*.pdf       tender documents
-├── status.json        new → scored → approved_to_bid | no_bid → drafted → sent_to_sharepoint → formatted
+├── status.json        new → scored → approved_to_bid | no_bid → drafted → sent_to_formatter → formatted
 ├── score.json         output of score_fit
 ├── requirements.json  output of extract_requirements (compliance matrix)
 └── draft/

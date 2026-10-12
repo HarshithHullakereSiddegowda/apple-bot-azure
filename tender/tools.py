@@ -473,7 +473,7 @@ def request_bid_decision(tender_id: str, recommendation: Literal["bid", "no_bid"
     status = store.get_status(tender_id)
     if status is None:
         return {"error": f"Unknown tender {tender_id!r}"}
-    if status in ("approved_to_bid", "no_bid", "drafted", "sent_to_sharepoint", "formatted"):
+    if status in ("approved_to_bid", "no_bid", "drafted", "sent_to_formatter", "formatted"):
         return {"status": status, "message": "A person has already recorded the decision for this tender.",
                 "decision": store.get_json(tender_id, "decision.json")}
     score = store.get_json(tender_id, "score.json")

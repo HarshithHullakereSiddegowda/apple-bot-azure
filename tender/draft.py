@@ -243,3 +243,29 @@ def draft_response(tender_id: str) -> dict:
             "words": sum(s["words"] for s in sections), "placeholders": placeholders,
             "warnings": [n for n in notes if not n.startswith(("Placeholder", "Generated"))],
             "files": ["draft/draft.docx", "draft/draft.json"], "tokens": tokens}
+
+
+# ── Tool 6: send_to_formatter (Agent 2 → Agent 3 hand-off) ────────────────────
+
+OUTBOX_CONTAINER = "formatter-inbox"   # Agent 3's input tray. Later: a SharePoint folder (same function, new target).
+
+
+def send_to_formatter(tender_id: str) -> dict:
+    """AGENT tool. Copy the latest draft.docx into Agent 3's input tray and mark the tender sent_to_formatter.
+
+    Internal hand-off only (our own storage); nothing leaves the organisation, so no human approval is needed here.
+    """
+    if store.get_status(tender_id) not in ("drafted", "sent_to_formatter"):
+        return {"error": f"{tender_id} has no draft yet (status {store.get_status(tender_id)!r}); run draft_response"}
+    data = store.get_file(tender_id, "draft/draft.docx")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    name = f"{tender_id}/{tender_id}-draft-{stamp}.docx"
+    outbox = store.container_for(OUTBOX_CONTAINER)
+    if not outbox.exists():
+        outbox.create_container()
+    outbox.upload_blob(name, data, overwrite=False,
+                       metadata={"tender_id": tender_id, "source": "agent2.draft_response"})
+    if store.get_status(tender_id) == "drafted":
+        store.set_status(tender_id, "sent_to_formatter", by="agent2.send_to_formatter", note=name)
+    return {"tender_id": tender_id, "status": "sent_to_formatter", "container": OUTBOX_CONTAINER, "blob": name,
+            "bytes": len(data), "message": "Draft handed to the formatter (Agent 3) tray."}

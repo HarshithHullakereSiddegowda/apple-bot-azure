@@ -20,11 +20,11 @@ from azure.ai.agents.models import FunctionDefinition, FunctionToolDefinition, L
 from azure.identity import DefaultAzureCredential
 
 from tender import tools
-from tender.draft import draft_response
+from tender.draft import draft_response, send_to_formatter
 from tender.ingest import ingest_tender
 
 AGENT_NAME = "tender-bid-analyst"
-AGENT_VERSION = "agent-v3"   # bump when instructions or tools change
+AGENT_VERSION = "agent-v5"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
 
@@ -40,9 +40,13 @@ def _tool(name: str, description: str, properties: dict, required: list[str]) ->
 
 
 TOOLS = [
-    _tool("list_tenders", "List tenders in the tray with status, verdict and score. Use to find tender IDs.",
-          {"status": {"type": "string", "description": "Optional filter: new, scored, approved_to_bid, no_bid, "
-                                                       "drafted"}}, []),
+    _tool("list_tenders", "List tenders in the tray with status, verdict and score. Use to find tender IDs. "
+                          "STATUS is where a tender is in the process; VERDICT is the AI's fit assessment. "
+                          "Tenders waiting for a human bid decision are status='awaiting_decision' (not a verdict).",
+          {"status": {"type": "string",
+                      "enum": ["new", "scored", "awaiting_decision", "approved_to_bid", "no_bid", "drafted",
+                               "sent_to_formatter", "formatted"],
+                      "description": "Optional process-status filter"}}, []),
     _tool("get_tender", "Notice details, status, documents and which analysis has run for one tender.",
           {"tender_id": _TID}, ["tender_id"]),
     _tool("score_fit", "Score one tender against Horsell's capability profile: verdict, score, service line, "
@@ -65,6 +69,9 @@ TOOLS = [
                             "evaluation criterion within page limits, with placeholders where evidence is missing. "
                             "Only works after a person has approved the bid; otherwise it returns an error.",
           {"tender_id": _TID}, ["tender_id"]),
+    _tool("send_to_formatter", "Hand the finished draft (.docx) to the formatter (Agent 3), which applies the company "
+                               "template. Use after draft_response when the user asks to send or finalise the draft.",
+          {"tender_id": _TID}, ["tender_id"]),
     _tool("ask_tender", "Answer a specific question about one tender from its documents and notice, with page "
                         "citations. Use for anything not covered by the other tools.",
           {"tender_id": _TID, "question": {"type": "string"}}, ["tender_id", "question"]),
@@ -80,6 +87,7 @@ DISPATCH = {
     "ask_tender": tools.ask_tender,
     "request_bid_decision": tools.request_bid_decision,
     "draft_response": draft_response,
+    "send_to_formatter": send_to_formatter,
     # record_bid_decision is deliberately NOT here: recording the decision is a human-only action.
 }
 
@@ -148,7 +156,8 @@ def run_turn(c: AgentsClient, agent_id: str, thread_id: str, question: str, trac
                     output, secs = json.dumps({"error": "tool-call limit reached for this turn"}), 0.0
                 else:
                     output, secs = _run_tool(tc.function.name, tc.function.arguments)
-                calls.append({"tool": tc.function.name, "arguments": tc.function.arguments, "seconds": round(secs, 1)})
+                calls.append({"tool": tc.function.name, "arguments": tc.function.arguments, "seconds": round(secs, 1),
+                              "output": output[:3000]})   # kept (shortened) for evals and audit
                 if trace:
                     print(f"   🔧 {tc.function.name}({tc.function.arguments})  → {len(output):,} chars, {secs:.1f}s")
                 outputs.append(ToolOutput(tool_call_id=tc.id, output=output))

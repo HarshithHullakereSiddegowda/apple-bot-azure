@@ -29,8 +29,8 @@ TRANSITIONS = {
     "scored": {"scored", "awaiting_decision", "approved_to_bid", "no_bid"},   # re-scoring allowed
     "awaiting_decision": {"awaiting_decision", "scored", "approved_to_bid", "no_bid"},
     "approved_to_bid": {"drafted"},
-    "drafted": {"drafted", "sent_to_sharepoint"},
-    "sent_to_sharepoint": {"formatted"},
+    "drafted": {"drafted", "sent_to_formatter"},
+    "sent_to_formatter": {"formatted"},
     "no_bid": set(),
     "formatted": set(),
 }
@@ -48,10 +48,16 @@ def check_transition(current: str | None, new: str, by: str) -> None:
         raise PermissionError(f"{new!r} is a human decision; signature {by!r} is not a person")
 
 
-@lru_cache(maxsize=1)
-def container() -> ContainerClient:
+@lru_cache(maxsize=8)
+def container_for(name: str) -> ContainerClient:
+    """Any container in the tender storage account (keyless: DefaultAzureCredential)."""
     account = os.environ["TENDER_STORAGE_ACCOUNT"]
-    return ContainerClient(f"https://{account}.blob.core.windows.net", CONTAINER, credential=DefaultAzureCredential())
+    return ContainerClient(f"https://{account}.blob.core.windows.net", name, credential=DefaultAzureCredential())
+
+
+def container() -> ContainerClient:
+    """The handoff container `tenders`."""
+    return container_for(CONTAINER)
 
 
 def _path(tender_id: str, name: str) -> str:
