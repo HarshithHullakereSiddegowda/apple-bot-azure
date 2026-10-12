@@ -169,3 +169,55 @@ def test_record_decision_is_not_an_agent_tool():
     from tender.agent import DISPATCH, TOOLS
     assert "record_bid_decision" not in DISPATCH
     assert "record_bid_decision" not in {t.function.name for t in TOOLS}
+
+
+# ── draft_response: plan, checks and document (no LLM) ───────────────────────
+
+REQ = {"response_parts": [{"part": "Part B", "content": "Response to evaluation criteria 1 to 3",
+                           "page_limit": "10 pages"}],
+       "evaluation_criteria": [{"number": "1", "name": "Capability", "weight_percent": 60},
+                               {"number": "2", "name": "Personnel", "weight_percent": 30},
+                               {"number": "3", "name": "Value for money", "weight_percent": 10}]}
+
+
+def test_word_budget_follows_page_limit_and_weights():
+    from tender.draft import plan_sections
+    plan = {p["criterion"]: p for p in plan_sections(REQ)}
+    assert plan["Value for money"]["price_criterion"] and plan["Value for money"]["word_budget"] == 60
+    assert plan["Capability"]["word_budget"] == 3000          # 10 pages × 450 × 60/90
+    assert plan["Personnel"]["word_budget"] == 1500           # 10 pages × 450 × 30/90
+
+
+def test_invented_figures_and_codes_are_flagged():
+    from tender.draft import unverified_claims
+    sources = "Delivered 7,300 pages on LAND 400 with AGSVA cleared staff. Founded 2007."
+    text = ("Since 2007 we delivered 7,300 pages on LAND 400 and 12,000 pages on SEA 5000, a 98% on-time rate. "
+            "[EVIDENCE NEEDED: 2025 project example]")
+    assert unverified_claims(text, sources) == ["12,000", "98%", "SEA 5000"]   # placeholder text is ignored
+
+
+def test_docx_highlights_placeholders_and_marks_draft():
+    import io
+
+    from docx import Document
+
+    from tender.draft import build_docx
+    draft = {"tender_id": "T-X", "title": "Test tender", "agency": "Agency",
+             "compliance": [{"id": "C1", "condition": "ISO 9001", "response": "[CONFIRM: certificate]"}],
+             "sections": [{"number": "1", "criterion": "Capability", "weight_percent": 60,
+                           "paragraphs": ["We write manuals. [EVIDENCE NEEDED: S1000D example]"]}],
+             "notes": ["Placeholder to resolve: [EVIDENCE NEEDED: S1000D example]"]}
+    doc = Document(io.BytesIO(build_docx(draft)))
+    text = "\n".join(p.text for p in doc.paragraphs)
+    assert "AI DRAFT" in text and "Criterion 1: Capability (60%)" in text
+    highlighted = [r.text for p in doc.paragraphs for r in p.runs if r.font.highlight_color]
+    assert "[EVIDENCE NEEDED: S1000D example]" in highlighted
+    assert doc.tables[0].rows[1].cells[2].text == "[CONFIRM: certificate]"
+
+
+def test_under_budget_section_is_flagged():
+    from tender.draft import check_section
+    plan = {"word_budget": 1000, "price_criterion": False}
+    short = {"paragraphs": ["word " * 300]}
+    assert any("under 60%" in w for w in check_section(short, plan, sources=""))
+    assert check_section({"paragraphs": ["word " * 800]}, plan, sources="") == []

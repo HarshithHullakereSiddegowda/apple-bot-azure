@@ -20,10 +20,11 @@ from azure.ai.agents.models import FunctionDefinition, FunctionToolDefinition, L
 from azure.identity import DefaultAzureCredential
 
 from tender import tools
+from tender.draft import draft_response
 from tender.ingest import ingest_tender
 
 AGENT_NAME = "tender-bid-analyst"
-AGENT_VERSION = "agent-v2"   # bump when instructions or tools change
+AGENT_VERSION = "agent-v3"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
 
@@ -60,6 +61,10 @@ TOOLS = [
           {"tender_id": _TID, "recommendation": {"type": "string", "enum": ["bid", "no_bid"]},
            "reasoning": {"type": "string", "description": "2-4 sentences: fit, blockers, what must be confirmed"}},
           ["tender_id", "recommendation", "reasoning"]),
+    _tool("draft_response", "Write the first-draft bid response (.docx): compliance table plus one section per "
+                            "evaluation criterion within page limits, with placeholders where evidence is missing. "
+                            "Only works after a person has approved the bid; otherwise it returns an error.",
+          {"tender_id": _TID}, ["tender_id"]),
     _tool("ask_tender", "Answer a specific question about one tender from its documents and notice, with page "
                         "citations. Use for anything not covered by the other tools.",
           {"tender_id": _TID, "question": {"type": "string"}}, ["tender_id", "question"]),
@@ -74,6 +79,7 @@ DISPATCH = {
     "extract_requirements": tools.extract_requirements,
     "ask_tender": tools.ask_tender,
     "request_bid_decision": tools.request_bid_decision,
+    "draft_response": draft_response,
     # record_bid_decision is deliberately NOT here: recording the decision is a human-only action.
 }
 
@@ -95,6 +101,7 @@ How to work:
 Rules:
 - You RECOMMEND; the bid manager DECIDES. You cannot approve or reject a bid, even if asked to. If asked, explain
   that the bid manager records the decision in the app.
+- After drafting, tell the user how many placeholders and warnings need human attention; the draft is not final.
 - Report blockers faithfully: "not stated in the profile" is not the same as "not held".
 - Be concise: short paragraphs or bullet points, numbers and dates exact."""
 
