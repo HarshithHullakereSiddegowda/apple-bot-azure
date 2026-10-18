@@ -18,10 +18,12 @@ import time
 from azure.ai.agents import AgentsClient
 from azure.ai.agents.models import FunctionDefinition, FunctionToolDefinition, ListSortOrder, RunStatus, ToolOutput
 from azure.identity import DefaultAzureCredential
+from opentelemetry.trace import Status, StatusCode
 
 from tender import tools
 from tender.draft import draft_response, send_to_formatter
 from tender.ingest import ingest_tender
+from tender.telemetry import capture_content, setup_tracing, trace_id_hex, tracer
 
 AGENT_NAME = "tender-bid-analyst"
 AGENT_VERSION = "agent-v5"   # bump when instructions or tools change
@@ -129,55 +131,101 @@ def ensure_agent(c: AgentsClient):
 
 # ── BRICK 5: the run loop (where Foundry and our code meet) ──────────────────
 
-def _run_tool(name: str, arguments: str) -> tuple[str, float]:
-    """Execute one tool call with OUR code. Errors go back to the agent as data so it can recover."""
-    t0 = time.perf_counter()
-    try:
-        fn = DISPATCH[name]
-        result = fn(**json.loads(arguments or "{}"))
-    except Exception as e:  # noqa: BLE001 - any failure is reported to the agent, never crashes the loop
-        result = {"error": f"{type(e).__name__}: {str(e)[:300]}"}
-    text = json.dumps(result, default=str)
-    if len(text) > MAX_TOOL_OUTPUT_CHARS:
-        text = text[:MAX_TOOL_OUTPUT_CHARS] + '..."(truncated)"'
-    return text, time.perf_counter() - t0
+def _run_tool(name: str, arguments: str, call_id: str | None = None) -> tuple[str, float]:
+    """Execute one tool call with OUR code. Errors go back to the agent as data so it can recover.
+
+    Traced as one `execute_tool <name>` span: duration, tender ID, output size, and ERROR status when the tool
+    failed or returned {"error": ...}, so error rate per tool is visible without reading logs."""
+    with tracer.start_as_current_span(f"execute_tool {name}") as span:
+        span.set_attributes({"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": name,
+                             "gen_ai.tool.type": "function"})
+        if call_id:
+            span.set_attribute("gen_ai.tool.call.id", call_id)
+        if capture_content():
+            span.set_attribute("gen_ai.tool.call.arguments", arguments or "{}")
+        t0 = time.perf_counter()
+        try:
+            args = json.loads(arguments or "{}")
+            if isinstance(args.get("tender_id"), str):
+                span.set_attribute("tender.id", args["tender_id"])   # IDs are not personal data; always kept
+            result = DISPATCH[name](**args)
+        except Exception as e:  # noqa: BLE001 - any failure is reported to the agent, never crashes the loop
+            span.record_exception(e)
+            result = {"error": f"{type(e).__name__}: {str(e)[:300]}"}
+        text = json.dumps(result, default=str)
+        truncated = len(text) > MAX_TOOL_OUTPUT_CHARS
+        if truncated:
+            text = text[:MAX_TOOL_OUTPUT_CHARS] + '..."(truncated)"'
+        span.set_attributes({"tender.tool.output_chars": len(text), "tender.tool.truncated": truncated})
+        if isinstance(result, dict) and "error" in result:
+            span.set_status(Status(StatusCode.ERROR, str(result["error"])[:200]))
+        return text, time.perf_counter() - t0
 
 
 def run_turn(c: AgentsClient, agent_id: str, thread_id: str, question: str, trace: bool = True) -> dict:
-    """One user turn: send the question, service tool calls until the run completes, return answer + trace."""
-    c.messages.create(thread_id=thread_id, role="user", content=question)
-    run = c.runs.create(thread_id=thread_id, agent_id=agent_id)
-    calls, t0 = [], time.perf_counter()
-    while run.status in (RunStatus.QUEUED, RunStatus.IN_PROGRESS, RunStatus.REQUIRES_ACTION):
-        if run.status == RunStatus.REQUIRES_ACTION:
-            outputs = []
-            for tc in run.required_action.submit_tool_outputs.tool_calls:
-                if len(calls) >= MAX_TOOL_CALLS_PER_TURN:
-                    output, secs = json.dumps({"error": "tool-call limit reached for this turn"}), 0.0
-                else:
-                    output, secs = _run_tool(tc.function.name, tc.function.arguments)
-                calls.append({"tool": tc.function.name, "arguments": tc.function.arguments, "seconds": round(secs, 1),
-                              "output": output[:3000]})   # kept (shortened) for evals and audit
-                if trace:
-                    print(f"   🔧 {tc.function.name}({tc.function.arguments})  → {len(output):,} chars, {secs:.1f}s")
-                outputs.append(ToolOutput(tool_call_id=tc.id, output=output))
-            run = c.runs.submit_tool_outputs(thread_id=thread_id, run_id=run.id, tool_outputs=outputs)
-        else:
-            time.sleep(0.8)
-            run = c.runs.get(thread_id=thread_id, run_id=run.id)
+    """One user turn: send the question, service tool calls until the run completes, return answer + trace.
 
-    answer = ""
-    if run.status == RunStatus.COMPLETED:
-        last = c.messages.get_last_message_text_by_role(thread_id=thread_id, role="assistant")
-        answer = last.text.value if last else ""
-    usage = getattr(run, "usage", None)
-    return {"status": str(run.status), "answer": answer, "tool_calls": calls,
-            "seconds": round(time.perf_counter() - t0, 1),
-            "tokens": getattr(usage, "total_tokens", None),
-            "error": getattr(run, "last_error", None)}
+    Traced as one `invoke_agent` span with a child per model step (Foundry thinking) and per tool call (our code),
+    so a slow turn shows exactly where the time went. The result carries `trace_id` to look the turn up."""
+    with tracer.start_as_current_span(f"invoke_agent {AGENT_NAME}") as span:
+        span.set_attributes({"gen_ai.operation.name": "invoke_agent", "gen_ai.agent.name": AGENT_NAME,
+                             "gen_ai.agent.id": agent_id, "gen_ai.conversation.id": thread_id,
+                             "tender.agent.version": AGENT_VERSION})
+        if capture_content():
+            span.set_attribute("tender.question", question)
+        c.messages.create(thread_id=thread_id, role="user", content=question)
+        run = c.runs.create(thread_id=thread_id, agent_id=agent_id)
+        calls, t0, steps = [], time.perf_counter(), 1
+        # A model step = time Foundry spends (queue + LLM) until it asks for tools or answers. Measured by polling
+        # every 0.8 s, so each step is accurate to about a second.
+        step = tracer.start_span("model_step 1", attributes={"tender.step": 1})
+        while run.status in (RunStatus.QUEUED, RunStatus.IN_PROGRESS, RunStatus.REQUIRES_ACTION):
+            if run.status == RunStatus.REQUIRES_ACTION:
+                step.end()
+                outputs = []
+                for tc in run.required_action.submit_tool_outputs.tool_calls:
+                    if len(calls) >= MAX_TOOL_CALLS_PER_TURN:
+                        output, secs = json.dumps({"error": "tool-call limit reached for this turn"}), 0.0
+                        span.set_attribute("tender.tool_call_limit_hit", True)
+                    else:
+                        output, secs = _run_tool(tc.function.name, tc.function.arguments, tc.id)
+                    calls.append({"tool": tc.function.name, "arguments": tc.function.arguments,
+                                  "seconds": round(secs, 1), "output": output[:3000]})   # kept for evals and audit
+                    if trace:
+                        print(f"   🔧 {tc.function.name}({tc.function.arguments})"
+                              f"  → {len(output):,} chars, {secs:.1f}s")
+                    outputs.append(ToolOutput(tool_call_id=tc.id, output=output))
+                run = c.runs.submit_tool_outputs(thread_id=thread_id, run_id=run.id, tool_outputs=outputs)
+                steps += 1
+                step = tracer.start_span(f"model_step {steps}", attributes={"tender.step": steps})
+            else:
+                time.sleep(0.8)
+                run = c.runs.get(thread_id=thread_id, run_id=run.id)
+        step.end()
+
+        answer = ""
+        if run.status == RunStatus.COMPLETED:
+            last = c.messages.get_last_message_text_by_role(thread_id=thread_id, role="assistant")
+            answer = last.text.value if last else ""
+        usage = getattr(run, "usage", None)
+        span.set_attributes({"tender.run.status": str(run.status), "tender.tool_calls": len(calls),
+                             "tender.model_steps": steps})
+        for attr, field in (("gen_ai.usage.input_tokens", "prompt_tokens"),
+                            ("gen_ai.usage.output_tokens", "completion_tokens")):
+            if getattr(usage, field, None) is not None:
+                span.set_attribute(attr, getattr(usage, field))
+        if run.status != RunStatus.COMPLETED:
+            span.set_status(Status(StatusCode.ERROR, str(getattr(run, "last_error", None))[:200]))
+        elif capture_content():
+            span.set_attribute("tender.answer", answer[:4000])
+        return {"status": str(run.status), "answer": answer, "tool_calls": calls,
+                "seconds": round(time.perf_counter() - t0, 1),
+                "tokens": getattr(usage, "total_tokens", None),
+                "error": getattr(run, "last_error", None), "trace_id": trace_id_hex(span)}
 
 
 def main() -> None:
+    setup_tracing()
     c = client()
     agent = ensure_agent(c)
     thread = c.threads.create()
@@ -189,7 +237,7 @@ def main() -> None:
             break
         r = run_turn(c, agent.id, thread.id, q)
         print(f"\nagent> {r['answer'] or r['error']}\n   [{r['status']} · {len(r['tool_calls'])} tool calls · "
-              f"{r['seconds']}s · {r['tokens']} tokens]")
+              f"{r['seconds']}s · {r['tokens']} tokens]" + (f"\n   trace {r['trace_id']}" if r["trace_id"] else ""))
         if questions is not None and not questions:
             break
     _ = ListSortOrder  # kept for message listing in later bricks

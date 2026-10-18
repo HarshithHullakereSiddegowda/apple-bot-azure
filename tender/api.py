@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from tender import store
 from tender.agent import client, ensure_agent, run_turn
+from tender.telemetry import setup_tracing
 from tender.tools import get_tender, list_tenders, record_bid_decision
 
 router = APIRouter(prefix="/tender", tags=["tender"])
@@ -25,6 +26,7 @@ router = APIRouter(prefix="/tender", tags=["tender"])
 @lru_cache(maxsize=1)
 def _agent_session():
     """Create/refresh the Foundry agent once per process and reuse it (avoids seconds of setup per message)."""
+    setup_tracing()
     c = client()
     return c, ensure_agent(c).id
 
@@ -73,7 +75,8 @@ def agent_chat(req: ChatRequest) -> dict:
     decisions = [d for tid in sorted(t for t in raised if t) if (d := _pending(tid))]
     return {"thread_id": thread_id, "answer": result["answer"],
             "tool_calls": [{"tool": t["tool"], "arguments": t["arguments"]} for t in result["tool_calls"]],
-            "pending_decisions": decisions, "seconds": result["seconds"]}
+            "pending_decisions": decisions, "seconds": result["seconds"],
+            "trace_id": result["trace_id"]}   # quote it in a bug report to find this exact turn
 
 
 @router.post("/tenders/{tender_id}/decision")
