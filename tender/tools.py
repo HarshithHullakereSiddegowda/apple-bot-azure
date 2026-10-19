@@ -375,10 +375,33 @@ def check_requirements(req: dict, chunks: list[dict], tender_text: str) -> tuple
     return req, warnings
 
 
-def extract_requirements(tender_id: str) -> dict:
+def _stale_reason(saved: dict | None, ingested_at: datetime | None) -> str:
+    """Why a saved checklist can't be reused ('' = reuse it). Pure: no storage, so it is unit-tested directly."""
+    if not saved:
+        return "none saved"
+    if saved.get("prompt_version") != REQUIREMENTS_PROMPT_VERSION:
+        return "prompt changed"
+    if saved.get("model") != CHAT_DEPLOYMENT:
+        return "model changed"
+    if ingested_at and datetime.fromisoformat(saved["extracted_at"]) < ingested_at:
+        return "documents re-ingested"
+    return ""
+
+
+def extract_requirements(tender_id: str, refresh: bool = False) -> dict:
     """Compliance checklist from ALL of a tender's ingested chunks. Saves requirements.json.
 
-    Traced in four child spans (load → LLM → checks → save) so a slow call shows which phase is slow."""
+    Reuses the saved checklist unless the prompt, model or documents changed, or refresh=True (saves ~7 s and
+    ~2,400 tokens per call). Traced: cache lookup, then load → LLM → checks → save on a miss."""
+    with tracer.start_as_current_span("cache lookup") as span:
+        saved = None if refresh else store.get_json(tender_id, "requirements.json")
+        ingested_at = store.modified_at(tender_id, "ingest.json") if saved else None
+        miss = "refresh requested" if refresh else _stale_reason(saved, ingested_at)
+        span.set_attribute("tender.cache_hit", not miss)
+        if miss:
+            span.set_attribute("tender.cache_miss_reason", miss)
+    if not miss:
+        return {**saved, "cached": True}
     with tracer.start_as_current_span("load_chunks") as span:
         chunks = _tender_chunks(tender_id)
         span.set_attribute("tender.chunks", len(chunks))

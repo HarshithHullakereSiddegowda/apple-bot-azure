@@ -79,6 +79,14 @@ def get_json(tender_id: str, name: str) -> dict | None:
         return None
 
 
+def modified_at(tender_id: str, name: str) -> datetime | None:
+    """When a tender file was last written (Blob's own timestamp, UTC). None if the file does not exist."""
+    try:
+        return container().get_blob_client(_path(tender_id, name)).get_blob_properties().last_modified
+    except ResourceNotFoundError:
+        return None
+
+
 def put_file(tender_id: str, name: str, data: bytes) -> None:
     container().upload_blob(_path(tender_id, name), data, overwrite=True)
 

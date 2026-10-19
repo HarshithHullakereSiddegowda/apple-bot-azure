@@ -26,7 +26,7 @@ from tender.ingest import ingest_tender
 from tender.telemetry import capture_content, setup_tracing, trace_id_hex, tracer
 
 AGENT_NAME = "tender-bid-analyst"
-AGENT_VERSION = "agent-v5"   # bump when instructions or tools change
+AGENT_VERSION = "agent-v6"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
 
@@ -59,8 +59,10 @@ TOOLS = [
           {"tender_id": _TID}, ["tender_id"]),
     _tool("extract_requirements", "Full compliance checklist from the tender documents: mandatory conditions, "
                                   "evaluation criteria and weightings, response parts and page limits, key dates, "
-                                  "pricing roles. Requires ingested documents.",
-          {"tender_id": _TID}, ["tender_id"]),
+                                  "pricing roles. Requires ingested documents. Returns the saved checklist when "
+                                  "still valid; set refresh=true only if the user asks to re-extract.",
+          {"tender_id": _TID, "refresh": {"type": "boolean", "description": "Force a fresh extraction"}},
+          ["tender_id"]),
     _tool("request_bid_decision", "Save your bid / no-bid RECOMMENDATION with reasoning and hand the decision to "
                                   "the bid manager. Call after score_fit when asked whether to bid. This does NOT "
                                   "decide; only a person can record the decision.",
