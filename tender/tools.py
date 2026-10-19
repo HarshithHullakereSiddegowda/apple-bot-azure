@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from tender import store
+from tender.telemetry import tracer
 
 PROFILE_PATH = Path(os.environ.get("TENDER_PROFILE", Path(__file__).parent / "data" / "horsell_profile.md"))
 
@@ -375,27 +376,39 @@ def check_requirements(req: dict, chunks: list[dict], tender_text: str) -> tuple
 
 
 def extract_requirements(tender_id: str) -> dict:
-    """Compliance checklist from ALL of a tender's ingested chunks. Saves requirements.json."""
-    chunks = _tender_chunks(tender_id)
+    """Compliance checklist from ALL of a tender's ingested chunks. Saves requirements.json.
+
+    Traced in four child spans (load → LLM → checks → save) so a slow call shows which phase is slow."""
+    with tracer.start_as_current_span("load_chunks") as span:
+        chunks = _tender_chunks(tender_id)
+        span.set_attribute("tender.chunks", len(chunks))
     if not chunks:
         return {"error": f"No ingested documents for {tender_id!r}; run ingest_tender first."}
     tender_text = "\n\n".join(f"[page {c['page']}]\n{c['content']}" for c in chunks)
     truncated = len(tender_text) > MAX_TENDER_CHARS
     tender_text = tender_text[:MAX_TENDER_CHARS]
 
-    resp = aoai.chat.completions.parse(
-        model=CHAT_DEPLOYMENT, temperature=0, response_format=Requirements,
-        messages=[{"role": "system", "content": REQUIREMENTS_SYSTEM},
-                  {"role": "user", "content": f"TENDER {tender_id} EXCERPTS:\n{tender_text}"}],
-    )
-    req, warnings = check_requirements(resp.choices[0].message.parsed.model_dump(), chunks, tender_text)
+    with tracer.start_as_current_span("chat extract_requirements") as span:
+        span.set_attributes({"gen_ai.operation.name": "chat", "gen_ai.request.model": CHAT_DEPLOYMENT,
+                             "tender.text_chars": len(tender_text), "tender.text_truncated": truncated})
+        resp = aoai.chat.completions.parse(
+            model=CHAT_DEPLOYMENT, temperature=0, response_format=Requirements,
+            messages=[{"role": "system", "content": REQUIREMENTS_SYSTEM},
+                      {"role": "user", "content": f"TENDER {tender_id} EXCERPTS:\n{tender_text}"}],
+        )
+        span.set_attributes({"gen_ai.usage.input_tokens": resp.usage.prompt_tokens,
+                             "gen_ai.usage.output_tokens": resp.usage.completion_tokens})
+    with tracer.start_as_current_span("check_requirements") as span:
+        req, warnings = check_requirements(resp.choices[0].message.parsed.model_dump(), chunks, tender_text)
+        span.set_attribute("tender.warnings", len(warnings))
     if truncated:
         warnings.append(f"tender text truncated at {MAX_TENDER_CHARS:,} characters")
     req.update({"tender_id": tender_id, "warnings": warnings, "prompt_version": REQUIREMENTS_PROMPT_VERSION,
                 "model": CHAT_DEPLOYMENT, "chunks_read": len(chunks),
                 "extracted_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "tokens": resp.usage.total_tokens})
-    store.put_json(tender_id, "requirements.json", req)
+    with tracer.start_as_current_span("save requirements.json"):
+        store.put_json(tender_id, "requirements.json", req)
     return req
 
 
