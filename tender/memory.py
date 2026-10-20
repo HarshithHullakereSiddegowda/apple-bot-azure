@@ -21,6 +21,7 @@ import json
 import math
 import sys
 import uuid
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -38,6 +39,9 @@ MIN_SCORE = 0.35                 # below this a match is noise (text-embedding-3
 DUPLICATE_SCORE = 0.95           # this close to an existing memory = the same memory
 
 Kind = Literal["fact", "decision"]
+
+# Set by the agent loop for one turn: which conversation, and what the user actually typed. remember_fact reads it.
+current_turn: ContextVar[dict | None] = ContextVar("current_turn", default=None)
 
 
 # ── storage: read-modify-write guarded by the blob's ETag ─────────────────────
@@ -104,7 +108,8 @@ def remember(text: str, kind: Kind = "fact", source: str = "", tender_id: str | 
                   "embedding": vector}
 
         def add(memories: list[dict]):
-            same = next((m for m in memories if _cosine(m["embedding"], vector) >= DUPLICATE_SCORE), None)
+            same = next((m for m in memories if m["kind"] == kind and m.get("tender_id") == tender_id
+                         and _cosine(m["embedding"], vector) >= DUPLICATE_SCORE), None)
             if same:
                 return {**_public(same), "duplicate": True}, False
             memories.append(record)

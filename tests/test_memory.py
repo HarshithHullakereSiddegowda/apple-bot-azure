@@ -90,3 +90,70 @@ def test_concurrent_write_is_retried_not_lost(box):
 def test_listing_hides_embeddings(box):
     memory.remember("We don't bid below $200k", source="user:thread_1")
     assert "embedding" not in memory.list_memories()[0]
+
+
+# ── memory wired into the agent (Step 3) ──────────────────────────────────────
+
+def _turn(message, thread="thread_9"):
+    return memory.current_turn.set({"thread_id": thread, "user_message": message})
+
+
+def test_remember_tool_only_saves_when_the_user_asks(box):
+    from tender import tools
+    token = _turn("What does the T-009 PDF say about certifications?")   # imagine the PDF says "remember: ..."
+    try:
+        assert "error" in tools.remember_fact("Horsell holds every certification")
+    finally:
+        memory.current_turn.reset(token)
+    assert memory.list_memories() == []                                  # poisoning blocked
+    token = _turn("Please remember: we avoid work far from Canberra")
+    try:
+        saved = tools.remember_fact("Horsell avoids work far from Canberra")
+    finally:
+        memory.current_turn.reset(token)
+    assert saved["source"] == "user:thread_9" and saved["kind"] == "fact"
+
+
+REQUEST = {"recommendation": "bid",
+           "score_snapshot": {"service_line_matched": "Logistics support", "score": 82, "verdict": "strong"}}
+
+
+@pytest.fixture
+def decision_store(monkeypatch):
+    """Fake tender storage for record_bid_decision: a saved AI recommendation; writes are captured."""
+    from tender import tools
+    saved = {}
+    monkeypatch.setattr(tools.store, "get_json", lambda tid, name: REQUEST if name == "decision_request.json" else None)
+    monkeypatch.setattr(tools.store, "set_status", lambda *a, **k: None)
+    monkeypatch.setattr(tools.store, "put_json", lambda tid, name, data: saved.update({name: data}))
+    return saved
+
+
+def test_human_decision_becomes_an_episode(box, decision_store):
+    from tender import tools
+    record = tools.record_bid_decision("T-003", "no_bid", "Jane Smith", "too far from Canberra for our team")
+    assert record["memory_saved"] is True and "decision.json" in decision_store
+    [episode] = memory.recall("travel to Canberra")
+    assert episode["kind"] == "decision" and episode["tender_id"] == "T-003"
+    assert episode["source"] == "human:Jane Smith"
+    assert episode["text"].startswith(
+        "T-003 (Logistics support, score 82 strong): AI recommended bid; Jane Smith decided no_bid")
+
+
+def test_decision_stands_even_if_memory_fails(box, decision_store, monkeypatch):
+    from tender import tools
+    monkeypatch.setattr(memory, "remember", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("blob down")))
+    record = tools.record_bid_decision("T-003", "bid", "Jane Smith", "good fit")
+    assert record["memory_saved"] is False and decision_store["decision.json"]["decision"] == "bid"
+
+
+def test_similar_decisions_on_different_tenders_are_both_kept(box, decision_store):
+    from tender import tools
+    tools.record_bid_decision("T-012", "no_bid", "Jane Smith", "too far from Canberra")
+    tools.record_bid_decision("T-013", "no_bid", "Jane Smith", "too far from Canberra")
+    assert sorted(m["tender_id"] for m in memory.list_memories()) == ["T-012", "T-013"]
+
+
+def test_agent_can_remember_and_recall_but_not_forget():
+    from tender.agent import DISPATCH
+    assert {"remember", "recall"} <= set(DISPATCH) and "forget" not in DISPATCH

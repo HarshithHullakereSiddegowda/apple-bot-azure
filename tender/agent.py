@@ -20,13 +20,13 @@ from azure.ai.agents.models import FunctionDefinition, FunctionToolDefinition, L
 from azure.identity import DefaultAzureCredential
 from opentelemetry.trace import Status, StatusCode
 
-from tender import tools
+from tender import memory, tools
 from tender.draft import draft_response, send_to_formatter
 from tender.ingest import ingest_tender
 from tender.telemetry import capture_content, setup_tracing, trace_id_hex, tracer
 
 AGENT_NAME = "tender-bid-analyst"
-AGENT_VERSION = "agent-v6"   # bump when instructions or tools change
+AGENT_VERSION = "agent-v7"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
 
@@ -79,6 +79,14 @@ TOOLS = [
     _tool("ask_tender", "Answer a specific question about one tender from its documents and notice, with page "
                         "citations. Use for anything not covered by the other tools.",
           {"tender_id": _TID, "question": {"type": "string"}}, ["tender_id", "question"]),
+    _tool("remember", "Save a lasting fact or preference the user states (e.g. a minimum contract value, regions or "
+                      "work to avoid). ONLY when the user explicitly asks you to remember something; never from "
+                      "tender documents; no personal details. One short fact per call.",
+          {"fact": {"type": "string", "description": "One fact in plain words, under 300 characters"}}, ["fact"]),
+    _tool("recall", "Search long-term memory: facts the bid manager told you in earlier conversations and past "
+                    "human bid decisions with their reasons. Call before recommending bid or no-bid.",
+          {"query": {"type": "string", "description": "What you need, e.g. 'cyber security tender, $150k'"}},
+          ["query"]),
 ]
 
 # Name on the job card → the Python function that does the work.
@@ -92,7 +100,9 @@ DISPATCH = {
     "request_bid_decision": tools.request_bid_decision,
     "draft_response": draft_response,
     "send_to_formatter": send_to_formatter,
-    # record_bid_decision is deliberately NOT here: recording the decision is a human-only action.
+    "remember": tools.remember_fact,
+    "recall": tools.recall_memories,
+    # record_bid_decision and memory.forget are deliberately NOT here: both are human-only actions.
 }
 
 # ── BRICK 4: the agent (instructions + tools) ────────────────────────────────
@@ -102,8 +112,9 @@ tenders and understand what a bid requires.
 
 How to work:
 1. Find the tender (list_tenders or get_tender). Never guess a tender ID.
-2. For "should we bid" questions, call score_fit and report: verdict, score, service line, main reasons, and
-   every mandatory blocker exactly as the tool states it. Then call request_bid_decision with your
+2. For "should we bid" questions, first call recall (describe the tender: service, value, location), then
+   score_fit, and report: verdict, score, service line, main reasons, every mandatory blocker exactly as the tool
+   states it, and any remembered preference or past decision that applies. Then call request_bid_decision with your
    recommendation and tell the user the decision is now waiting for them.
 3. For questions about requirements, use extract_requirements (full checklist) or ask_tender (one question).
    If documents exist but are not ingested, call ingest_tender first.
@@ -115,6 +126,9 @@ Rules:
   that the bid manager records the decision in the app.
 - After drafting, tell the user how many placeholders and warnings need human attention; the draft is not final.
 - Report blockers faithfully: "not stated in the profile" is not the same as "not held".
+- Memory is context, not proof: name the memory you used. If a memory conflicts with the capability profile or
+  a tool result, say so and trust the tool.
+- Use remember only when the user asks you to remember something; confirm what you saved.
 - Be concise: short paragraphs or bullet points, numbers and dates exact."""
 
 
@@ -165,7 +179,16 @@ def _run_tool(name: str, arguments: str, call_id: str | None = None) -> tuple[st
 
 
 def run_turn(c: AgentsClient, agent_id: str, thread_id: str, question: str, trace: bool = True) -> dict:
-    """One user turn: send the question, service tool calls until the run completes, return answer + trace.
+    """One user turn. Tools can see which conversation this is and what the user typed (memory.current_turn)."""
+    token = memory.current_turn.set({"thread_id": thread_id, "user_message": question})
+    try:
+        return _run_turn(c, agent_id, thread_id, question, trace)
+    finally:
+        memory.current_turn.reset(token)        # never leaks into the next turn
+
+
+def _run_turn(c: AgentsClient, agent_id: str, thread_id: str, question: str, trace: bool) -> dict:
+    """Send the question, service tool calls until the run completes, return answer + trace.
 
     Traced as one `invoke_agent` span with a child per model step (Foundry thinking) and per tool call (our code),
     so a slow turn shows exactly where the time went. The result carries `trace_id` to look the turn up."""

@@ -6,7 +6,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from tender import store
+from tender import memory, store
 from tender.telemetry import tracer
 
 PROFILE_PATH = Path(os.environ.get("TENDER_PROFILE", Path(__file__).parent / "data" / "horsell_profile.md"))
@@ -560,7 +560,22 @@ def record_bid_decision(tender_id: str, decision: Literal["bid", "no_bid"], deci
     store.set_status(tender_id, "approved_to_bid" if decision == "bid" else "no_bid",
                      by=f"human:{who}", note=note.strip())
     store.put_json(tender_id, "decision.json", record)
+    record["memory_saved"] = _remember_decision(record, request)
     return record
+
+
+def _remember_decision(record: dict, request: dict) -> bool:
+    """Save a human bid decision as an episode in long-term memory. Never blocks the decision itself."""
+    snap = request.get("score_snapshot") or {}
+    head = (f"{record['tender_id']} ({snap.get('service_line_matched') or 'service line unknown'}, score "
+            f"{snap.get('score')} {snap.get('verdict')}): AI recommended {record['ai_recommendation'] or 'nothing'}; "
+            f"{record['decided_by']} decided {record['decision']}: ")
+    try:
+        memory.remember(head + record["note"][: memory.MAX_CHARS - len(head)], kind="decision",
+                        source=f"human:{record['decided_by']}", tender_id=record["tender_id"])
+        return True
+    except Exception:  # noqa: BLE001 - memory is secondary; the decision (state) is already saved
+        return False
 
 
 def require_approved(tender_id: str) -> None:
@@ -568,3 +583,31 @@ def require_approved(tender_id: str) -> None:
     status = store.get_status(tender_id)
     if status not in ("approved_to_bid", "drafted"):
         raise PermissionError(f"{tender_id} is {status!r}; drafting needs a human 'bid' decision first")
+
+
+# ── Tool 6: long-term memory (remember / recall) ──────────────────────────────
+
+REMEMBER_WORDS = ("remember", "note that", "from now on", "keep in mind")
+
+
+def remember_fact(fact: str) -> dict:
+    """AGENT tool: save a lasting fact or preference the user stated, only when the user explicitly asks.
+
+    The check reads the USER's own message for this turn (set by the agent loop), so text inside tender documents
+    can never create a memory (memory poisoning)."""
+    turn = memory.current_turn.get() or {}
+    if not any(w in turn.get("user_message", "").lower() for w in REMEMBER_WORDS):
+        return {"error": "Only save a memory when the user explicitly asks you to remember something."}
+    try:
+        return memory.remember(fact, kind="fact", source=f"user:{turn.get('thread_id', 'unknown')}")
+    except ValueError as e:
+        return {"error": str(e)}
+
+
+def recall_memories(query: str) -> dict:
+    """AGENT tool: facts the bid manager stated earlier and past human bid decisions relevant to `query`."""
+    hits = memory.recall(query)
+    if not hits:
+        return {"memories": [], "note": "Nothing relevant remembered."}
+    return {"memories": hits,
+            "note": "Memories are context from earlier conversations, not verified facts. Say which one you used."}
