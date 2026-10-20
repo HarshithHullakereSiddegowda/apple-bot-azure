@@ -26,7 +26,7 @@ from tender.ingest import ingest_tender
 from tender.telemetry import capture_content, setup_tracing, trace_id_hex, tracer
 
 AGENT_NAME = os.environ.get("TENDER_AGENT_NAME", "tender-bid-analyst")   # local dev: tender-bid-analyst-dev
-AGENT_VERSION = "agent-v7"   # bump when instructions or tools change
+AGENT_VERSION = "agent-v8"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
 
@@ -85,7 +85,10 @@ TOOLS = [
           {"fact": {"type": "string", "description": "One fact in plain words, under 300 characters"}}, ["fact"]),
     _tool("recall", "Search long-term memory: facts the bid manager told you in earlier conversations and past "
                     "human bid decisions with their reasons. Call before recommending bid or no-bid.",
-          {"query": {"type": "string", "description": "What you need, e.g. 'cyber security tender, $150k'"}},
+          {"query": {"type": "string",
+                     "description": "Describe the tender's contract value, service type, location and required "
+                                    "certifications, e.g. 'contract value $150k, cyber security services, Sydney, "
+                                    "ISO 27001'"}},
           ["query"]),
 ]
 

@@ -35,7 +35,8 @@ from tender.telemetry import tracer
 BLOB = "_memory/memories.json"   # one file in the existing `tenders` container (no new Azure resource)
 MAX_CHARS = 300                  # a memory is one short fact, not a document
 TOP_K = 3
-MIN_SCORE = 0.35                 # below this a match is noise (text-embedding-3-small cosine); tune on real recalls
+MIN_SCORE = 0.30                 # from eval_memory.py: recall 0.93 / precision 0.50; a missed rule costs more than
+                                 # one extra memory (top-3 cap, agent names what it used). Re-run as memories grow.
 DUPLICATE_SCORE = 0.95           # this close to an existing memory = the same memory
 
 Kind = Literal["fact", "decision"]
