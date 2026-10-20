@@ -57,9 +57,9 @@ def _turn():
 
 def test_one_turn_is_one_trace_with_model_and_tool_spans():
     result, spans = _turn()
-    assert set(spans) == {"invoke_agent tender-bid-analyst", "model_step 1", "model_step 2",
+    assert set(spans) == {f"invoke_agent {agent.AGENT_NAME}", "model_step 1", "model_step 2",
                           "execute_tool get_tender", "execute_tool list_tenders"}
-    turn = spans["invoke_agent tender-bid-analyst"]
+    turn = spans[f"invoke_agent {agent.AGENT_NAME}"]
     for name, s in spans.items():
         assert s.context.trace_id == turn.context.trace_id, name          # all in ONE trace
         if s is not turn:
@@ -90,7 +90,7 @@ def test_content_is_not_recorded_unless_allowed(monkeypatch):
     EXPORTER.clear()
     monkeypatch.setenv("TENDER_TRACE_CONTENT", "true")
     _, spans = _turn()
-    assert spans["invoke_agent tender-bid-analyst"].attributes["tender.question"] == "Should Horsell bid on T-009?"
+    assert spans[f"invoke_agent {agent.AGENT_NAME}"].attributes["tender.question"] == "Should Horsell bid on T-009?"
     assert spans["execute_tool get_tender"].attributes["gen_ai.tool.call.arguments"] == '{"tender_id": "T-009"}'
 
 

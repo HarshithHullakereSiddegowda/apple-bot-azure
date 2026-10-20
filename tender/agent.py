@@ -25,7 +25,7 @@ from tender.draft import draft_response, send_to_formatter
 from tender.ingest import ingest_tender
 from tender.telemetry import capture_content, setup_tracing, trace_id_hex, tracer
 
-AGENT_NAME = "tender-bid-analyst"
+AGENT_NAME = os.environ.get("TENDER_AGENT_NAME", "tender-bid-analyst")   # local dev: tender-bid-analyst-dev
 AGENT_VERSION = "agent-v7"   # bump when instructions or tools change
 MAX_TOOL_OUTPUT_CHARS = 8000   # keep tool results small enough for the model's context
 MAX_TOOL_CALLS_PER_TURN = 12   # stop runaway loops
